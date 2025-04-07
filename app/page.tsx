@@ -1,5 +1,7 @@
 "use client";
+import Link from 'next/link';
 import { useState } from "react";
+
 export default function Home() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -22,8 +24,8 @@ export default function Home() {
 
           {isDropdownOpen && (
             <div className="fixed top-14 left-[calc(100%-150px)] w-30 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-              <a href="/login/client" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Client</a>
-              <a href="/login/investor" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Investor</a>
+              <a href="/login_client" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Client</a>
+              <a href="/login_investor" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Investor</a>
               </div>
           )}
           </li>
@@ -44,14 +46,21 @@ export default function Home() {
         <div className="bg-[#f9eee4c8] p-6 rounded-2xl shadow-lg w-[300px] text-center">
           <h2 className="text-2xl font-bold text-gray-800">For Clients</h2>
           <p className="text-gray-600 mt-5">Propose innovative startup ideas and get connected with the right investors.</p>
-          <button className="mt-4 bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Get Started</button>
+          <Link href="/signup_client">
+          <button type="button" className="mt-4 bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+            Get Started
+          </button>
+          </Link>
+
         </div>
 
         {/* Investor Card */}
         <div className="bg-[#f9eee4c8] p-6 rounded-2xl shadow-lg w-[300px] text-center">
           <h2 className="text-xl font-bold text-gray-800">For Investors</h2>
           <p className="text-gray-600 mt-2">Explore a diverse range of promising startups to make impactful, game-changing investments.</p>
+          <Link href="/signup_investor">
           <button className="mt-4 bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Explore</button>
+          </Link>
         </div>
       </div>
       <style jsx>{`
