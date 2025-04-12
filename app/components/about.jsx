@@ -3,6 +3,7 @@
 import React from "react";
 import Works from "./works";
 import Contact from "./contact";
+import Link from "next/link";
 
 export default function AboutPage() {
   return (
@@ -57,12 +58,17 @@ className="px-4 sm:px-8 md:px-10 py-20 bg-[#f3e4d2]"
 
             {/* Buttons */}
             <div className="mt-10 flex flex-col sm:flex-row sm:justify-center sm:items-center gap-6">
+              <Link href="/signup_client">
               <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition">
                 Join as a Startup
               </button>
+              </Link>
+              <Link href="/signup_investor">
+
               <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition">
                 Join as an Investor
               </button>
+              </Link>
             </div>
           </div>
         </div>
