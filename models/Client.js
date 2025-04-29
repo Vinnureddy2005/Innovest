@@ -13,7 +13,8 @@ const ClientSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  
+  photo: { type: String },
+  validUpto:String,
 });
 
 const Client = mongoose.models.Client || mongoose.model('Client', ClientSchema);

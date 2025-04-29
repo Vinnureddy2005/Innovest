@@ -8,7 +8,7 @@ export async function POST(req) {
     const data = await req.json();
     const {
       fullName, email, phone, password, confirmPassword,
-      membershipPlan,transactionId
+      membershipPlan,validUpto,transactionId
     } = data;
 
     if (password !== confirmPassword) {
@@ -29,7 +29,8 @@ export async function POST(req) {
       password,
       membershipPlan,
       transactionId,
-      access: false // 👈 hidden field, default false
+      access: false ,
+      validUpto
     });
     
 

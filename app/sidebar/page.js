@@ -30,7 +30,7 @@ export default function Sidebar({ darkMode, handleLogout }) {
         </li>
         <li className="flex items-center gap-2 hover:text-blue-500">
           <User size={20} />
-          <Link href="/edit-profile">Edit Profile</Link>
+          <Link href="/client_editprofile">Edit Profile</Link>
         </li>
         <li className="flex items-center gap-2 text-red-500 hover:text-red-600 cursor-pointer" onClick={handleLogout}>
           <LogOut size={20} />
