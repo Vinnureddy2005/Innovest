@@ -20,10 +20,30 @@ export default function ProposeIdeaPage() {
   const router = useRouter(); 
   
   
-  const industries = ['Tech', 'Healthcare', 'FinTech', 'EdTech'];
-  const stages = ['Idea', 'Prototype', 'MVP', 'Scaling', 'Revenue-Generating'];
-  const fundingOptions = ['None', 'Bootstrapped', 'Seed', 'Series A', 'Series B+'];
-
+  const industries = [
+    'Technology',
+    'Healthcare',
+    'Finance',
+    'Education',
+    'Retail and E-commerce',
+    'Environment and Energy',
+    'Real Estate and Construction',
+    'Media and Entertainment',
+    'Transportation and Logistics',
+    'Aerospace and Defense',
+    'Food and Agriculture',
+    'Travel and Hospitality',
+    'Legal and Compliance',
+    'Consumer Services'
+  ];
+  const stages = ['Early-Stage','Growth-Stage','Late-Stage'];
+  const fundingOptions = [
+    'None (Self-funded)',
+    '<$50k',
+    '$50k-$500k',
+    '$500k-$5M',
+    '$5M+'
+  ];
   const handleChange = (e, any) => {
     const { name, value, type, checked, files } = e.target;
     if (type === 'checkbox') {

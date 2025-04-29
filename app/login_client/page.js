@@ -137,7 +137,7 @@ export default function LoginForm() {
       setMessage(data.message);
 
       // Redirect to dashboard
-      router.push(`/dashboard?email=${encodeURIComponent(formData.email)}`);
+      router.push(`/client_dashboard?email=${encodeURIComponent(formData.email)}`);
 
     } catch (err) {
       setError(err.message);
