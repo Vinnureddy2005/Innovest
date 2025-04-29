@@ -3,7 +3,7 @@
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Sidebar from '../sidebar/page';
+import Sidebar from '../client_sidebar/page';
 
 export default function DashboardPage() {
   const router = useRouter(); 

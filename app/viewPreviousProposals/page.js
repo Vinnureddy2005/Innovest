@@ -4,7 +4,7 @@ import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaHeart } from 'react-icons/fa';
-import Sidebar from '../sidebar/page';
+import Sidebar from '../client_sidebar/page';
 export default function ViewPreviousProposals() {
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(true);

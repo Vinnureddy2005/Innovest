@@ -333,18 +333,30 @@ export default function SignupTabs() {
                     <option value="Late-Stage">Late-Stage</option>
                   </select>
                   <select name="preferredIndustries" value={formData.preferredIndustries} onChange={handleChange} className="input" required>
-                    <option value="">Preferred Industry</option>
-                    <option value="TechAI">TechAI</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Healthcare">Healthcare</option>
-                    <option value="EdTech">EdTech</option>
+                  <option value="">Preferred Industry</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Education">Education</option>
+                  <option value="Retail and E-commerce">Retail and E-commerce</option>
+                  <option value="Environment and Energy">Environment and Energy</option>
+                  <option value="Real Estate and Construction">Real Estate and Construction</option>
+                  <option value="Media and Entertainment">Media and Entertainment</option>
+                  <option value="Transportation and Logistics">Transportation and Logistics</option>
+                  <option value="Aerospace and Defense">Aerospace and Defense</option>
+                  <option value="Food and Agriculture">Food and Agriculture</option>
+                  <option value="Travel and Hospitality">Travel and Hospitality</option>
+                  <option value="Legal and Compliance">Legal and Compliance</option>
+                  <option value="Consumer Services">Consumer Services</option>
+
                   </select>
                   <select name="investmentSize" value={formData.investmentSize} onChange={handleChange} className="input" required>
-                    <option value="">Investment Size</option>
-                    <option value="<$50k">&lt;$50k</option>
-                    <option value="$50k-$500k">$50k-$500k</option>
-                    <option value="$500k-$5M">$500k-$5M</option>
-                    <option value="$5M+">$5M+</option>
+                  <option value="">Select Funding</option>
+                  <option value="None (Self-funded)">None (Self-funded)</option>
+                  <option value="<$50k">&lt;$50k</option>
+                  <option value="$50k-$500k">$50k - $500k</option>
+                  <option value="$500k-$5M">$500k - $5M</option>
+                  <option value="$5M+">$5M+</option>
                   </select>
                   <select name="membershipPlan" value={formData.membershipPlan} onChange={handleChange} className="input" required>
                     <option value="">Membership Plan</option>
