@@ -1,60 +1,69 @@
 import { connectToDB } from '@/lib/mongodb';
 import Investor from '@/models/Investor';
-import propose from '@/models/propose';
+import Propose from '@/models/propose';
+import stringSimilarity from 'string-similarity';
+
 export async function GET(req) {
   try {
     await connectToDB();
 
     const url = new URL(req.url);
     const email = url.searchParams.get('email');
-    console.log('Investor ID:', email);
 
+    // 1. Fetch investor
     const investor = await Investor.findOne({ email });
-
     if (!investor) {
       return new Response(JSON.stringify({ message: 'Investor not found' }), { status: 404 });
     }
 
-    // 3. Fetch all proposals
-    const proposals = await propose.find();
-    console.log('Proposals fetched:', proposals.length, 'proposals');
+    // 2. Fetch all proposals
+    const proposals = await Propose.find();
+    if (proposals.length === 0) {
+      return new Response(JSON.stringify({ message: 'No proposals found' }), { status: 404 });
+    }
 
-    // 4. Calculate recommendation score
-    const recommendations = proposals.map(proposal => {
-      let score = 0;
+    const investorIndustries = (investor.preferredIndustries || []).map(i => i.toLowerCase());
+    const investorStage = (investor.investmentFocus || '').toLowerCase();
+    const investorFunding = (investor.investmentSize || '').toLowerCase();
 
-      // Industry match
-      if (investor.preferredIndustries?.includes(proposal.industry)) {
-        score += 5;
-        console.log(`Industry match for ${proposal.startupName}, score: ${score}`);
-      }
+    // 3. Filter proposals that match industry (case-insensitive)
+    const filtered = proposals.filter(p =>
+      investorIndustries.includes((p.industry || '').toLowerCase())
+    );
 
-      // Investment focus match
-      if (investor.investmentFocus === proposal.stage) {
+    // 4. Score the proposals
+    const scoredProposals = filtered.map(proposal => {
+      let score = 5; // Base score for industry match
+
+      // Match: stage
+      if ((proposal.stage || '').toLowerCase() === investorStage) {
         score += 3;
-        console.log(`Investment focus match for ${proposal.startupName}, score: ${score}`);
       }
 
-      // Investment size match
-      if (investor.investmentSize === proposal.funding) {
+      // Match: funding
+      if ((proposal.funding || '').toLowerCase() === investorFunding) {
         score += 2;
-        console.log(`Investment size match for ${proposal.startupName}, score: ${score}`);
       }
+
+      // Match: description similarity (optional)
+      const proposalDesc = proposal.description || '';
+      const textQuery = `${investorIndustries.join(' ')} ${investorStage} ${investorFunding}`;
+      const descSim = stringSimilarity.compareTwoStrings(proposalDesc, textQuery);
+      score += descSim * 5; // bonus points
 
       return { proposal, score };
     });
 
-    // 5. Sort by score, pick top 5 recommendations
-    recommendations.sort((a, b) => b.score - a.score);
-    console.log('Sorted recommendations by score.');
+    // 5. Sort by score
+    scoredProposals.sort((a, b) => b.score - a.score);
 
-    const topRecommendations = recommendations.slice(0, 5).map(rec => rec.proposal);
-    console.log('Top 5 recommendations:', topRecommendations);
+    // 6. Return top 5 proposals
+    const topRecommendations = scoredProposals.slice(0, 5).map(rec => rec.proposal);
 
     return new Response(JSON.stringify(topRecommendations), { status: 200 });
 
   } catch (error) {
-    console.error('Error during API execution:', error);
+    console.error('Error during recommendation:', error);
     return new Response(JSON.stringify({ message: 'Server Error' }), { status: 500 });
   }
 }

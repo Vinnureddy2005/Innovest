@@ -35,7 +35,8 @@ const InvestorSchema = new mongoose.Schema({
     enum: ['Early-Stage', 'Growth-Stage', 'Late-Stage'],
   },
   preferredIndustries: {
-    type: [String], // e.g., ['Tech', 'Finance']
+    type: [String], // ← This ensures it's an array of strings
+    required: true,
   },
   investmentSize: {
     type: String,
@@ -55,9 +56,6 @@ const InvestorSchema = new mongoose.Schema({
    type:String
    
   },
-
-  photo: { type: String },
-  validUpto:String,
 
   createdAt: {
     type: Date,

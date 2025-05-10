@@ -1,23 +1,22 @@
-
-
-
-
 "use client";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import DashboardPage from "../investor_sidebar/page";
+import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 
 const Dashboard = () => {
   const [recommendedStartups, setRecommendedStartups] = useState([]);
   const [meetingLinks, setMeetingLinks] = useState({});
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
+  const [likedStartups, setLikedStartups] = useState(new Set());
+  const [investedStartups, setInvestedStartups] = useState(new Set());
 
   useEffect(() => {
     if (!email) return;
     sessionStorage.setItem('email', email);
-    console.log("inv",email)
 
     const fetchRecommendedStartups = async () => {
       try {
@@ -32,7 +31,33 @@ const Dashboard = () => {
     fetchRecommendedStartups();
   }, [email]);
 
-
+  useEffect(() => {
+    if (!email) return;
+  
+    const fetchInvestorResponses = async () => {
+      try {
+        const res = await fetch(`/api/investorResponse?email=${email}`);
+        const data = await res.json();
+  
+        const likedSet = new Set();
+        const investedSet = new Set();
+  
+        data.forEach((item) => {
+          if (item.liked) likedSet.add(item.startupId); // FIX: use startupId
+          if (item.invested) investedSet.add(item.startupId); // FIX: use startupId
+        });
+  
+        setLikedStartups(likedSet);
+        setInvestedStartups(investedSet);
+      } catch (error) {
+        console.error("Error fetching investor responses:", error);
+      }
+    };
+  
+    fetchInvestorResponses();
+  }, [email]);
+  
+  
  //const[investor_name,Setinvestor_name]=useState('intial');
   const fetchName = async (email) => {
   try {
@@ -64,63 +89,6 @@ const [selectedDateTime, setSelectedDateTime] = useState({});
 
 const [loadingMeetings, setLoadingMeetings] = useState({});
 
-
-// const scheduleMeeting = async (startupId, startupName, client_mail,fullName) => {
-
-//   const startTime = selectedDateTime[startupId];
-//   if (!startTime) {
-//     alert("Please select a date and time first.");
-//     return;
-//   }
-
-//   if (!session) {
-//     alert("Please log in to schedule a meeting!");
-//     return;
-//   }
-
-//   const accessToken = session?.accessToken;
-//   if (!accessToken) {
-//     alert("No access token found. Please log in again.");
-//     signOut();
-//     return;
-//   }
-
-// const res = await fetch("/api/schedule-meeting", {
-//   method: "POST",
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-//   body: JSON.stringify({
-//   accessToken,
-//   startDateTime: startTime,
-//   startupName,
-//   client_mail,
-//   investor_name:fullName,
-//   investor_email:email,
- 
-  
-// }),
-
-// });
-// ;
-    
-
-  
-//   const data = await res.json();
-
-//   console.log(data)
-
-//   if (data.meetingLink) {
-//     setMeetingLinks((prev) => ({
-//       ...prev,
-//       [startupId]: data.meetingLink,
-//     }));
-//     alert("Meeting Scheduled Sucessfully!!")
-//     setActiveStartupId(null); // hide the input after scheduling
-//   } else {
-//     alert("Failed to schedule meeting.");
-//   }
-// };
 
 const scheduleMeeting = async (startupId, startupName, client_mail, fullName) => {
   const startTime = selectedDateTime[startupId];
@@ -180,7 +148,58 @@ const scheduleMeeting = async (startupId, startupName, client_mail, fullName) =>
     setLoadingMeetings((prev) => ({ ...prev, [startupId]: false }));
   }
 };
+const handleLike = async (startup) => {
+  const investorEmail = sessionStorage.getItem('email');
+  const liked = !likedStartups.has(startup._id); 
 
+  try {
+    await fetch('/api/investorResponse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: investorEmail,
+        startupId: startup._id,
+        startupName: startup.startupName,
+        liked,
+      }),
+    });
+
+    setLikedStartups((prev) => {
+      const newSet = new Set(prev);
+      liked ? newSet.add(startup._id) : newSet.delete(startup._id);
+      return newSet;
+    });
+  } catch (error) {
+    console.error("Error updating like:", error);
+  }
+};
+
+
+const handleInvested = async (startup) => {
+  const investorEmail = sessionStorage.getItem('email');
+  const invested = !investedStartups.has(startup.startupName); // toggle
+
+  try {
+    await fetch('/api/investorResponse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: investorEmail,
+        startupId: startup._id,
+        startupName: startup.startupName,
+        invested,
+      }),
+    });
+
+    setInvestedStartups((prev) => {
+      const newSet = new Set(prev);
+      invested ? newSet.add(startup._id) : newSet.delete(startup._id);
+      return newSet;
+    });
+  } catch (error) {
+    console.error("Error updating invested:", error);
+  }
+};
 
   return (
     <div className="min-h-screen flex bg-gray-100">
@@ -334,6 +353,29 @@ const scheduleMeeting = async (startupId, startupName, client_mail, fullName) =>
                 >
                   Visit Website
                 </a>
+                <div className="mt-4 flex gap-4 items-center">
+  {/* Like Button */}
+  <button onClick={() => handleLike(startup)}>
+  {likedStartups.has(startup._id) ? (
+    <HeartSolid className="w-6 h-6 text-red-500 cursor-pointer" />
+  ) : (
+    <HeartOutline className="w-6 h-6 text-gray-400 cursor-pointer" />
+  )}
+</button>
+
+
+<button
+  onClick={() => handleInvested(startup)}
+  className={`px-3 py-1 border rounded-lg text-sm transition ${
+    investedStartups.has(startup._id)
+      ? 'bg-green-600 text-white border-green-600'
+      : 'text-green-600 border-green-600'
+  }`}
+>
+  {investedStartups.has(startup._id) ? 'Invested' : 'Mark as Invested'}
+</button>
+
+</div>
               </div>
             ))}
           </div>
