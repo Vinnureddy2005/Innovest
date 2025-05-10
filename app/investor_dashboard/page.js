@@ -1,10 +1,10 @@
 "use client";
+import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import DashboardPage from "../investor_sidebar/page";
-import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 
 const Dashboard = () => {
   const [recommendedStartups, setRecommendedStartups] = useState([]);
@@ -148,11 +148,46 @@ const scheduleMeeting = async (startupId, startupName, client_mail, fullName) =>
     setLoadingMeetings((prev) => ({ ...prev, [startupId]: false }));
   }
 };
+// const handleLike = async (startup) => {
+//   const investorEmail = sessionStorage.getItem('email');
+//   const liked = !likedStartups.has(startup._id); 
+
+//   try {
+//     await fetch('/api/investorResponse', {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify({
+//         email: investorEmail,
+//         startupId: startup._id,
+//         startupName: startup.startupName,
+//         liked,
+//       }),
+//     });
+
+//     setLikedStartups((prev) => {
+//       const newSet = new Set(prev);
+//       liked ? newSet.add(startup._id) : newSet.delete(startup._id);
+//       return newSet;
+//     });
+//   } catch (error) {
+//     console.error("Error updating like:", error);
+//   }
+// };
+
 const handleLike = async (startup) => {
   const investorEmail = sessionStorage.getItem('email');
-  const liked = !likedStartups.has(startup._id); 
+  if (!investorEmail) return;
 
   try {
+    // Step 1: Fetch the investor response for the current startup
+    const res = await fetch(`/api/investorResponse?email=${investorEmail}&startupId=${startup._id}`);
+    const data = await res.json();
+
+    // Check if the response exists for this startup and investor
+    const existingResponse = data.length > 0 ? data[0] : null;
+    const alreadyLiked = existingResponse ? existingResponse.liked : false;
+
+    // Step 2: Send updated like status to the backend
     await fetch('/api/investorResponse', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -160,20 +195,21 @@ const handleLike = async (startup) => {
         email: investorEmail,
         startupId: startup._id,
         startupName: startup.startupName,
-        liked,
+        liked: !alreadyLiked,  // Toggle based on current status
       }),
     });
 
+    // Step 3: Update UI state
     setLikedStartups((prev) => {
       const newSet = new Set(prev);
-      liked ? newSet.add(startup._id) : newSet.delete(startup._id);
+      !alreadyLiked ? newSet.add(startup._id) : newSet.delete(startup._id);
       return newSet;
     });
+
   } catch (error) {
     console.error("Error updating like:", error);
   }
 };
-
 
 const handleInvested = async (startup) => {
   const investorEmail = sessionStorage.getItem('email');
@@ -354,37 +390,39 @@ const handleInvested = async (startup) => {
                   Visit Website
                 </a>
                 <div className="mt-4 flex gap-4 items-center">
-  {/* Like Button */}
-  <button onClick={() => handleLike(startup)}>
-  {likedStartups.has(startup._id) ? (
-    <HeartSolid className="w-6 h-6 text-red-500 cursor-pointer" />
-  ) : (
-    <HeartOutline className="w-6 h-6 text-gray-400 cursor-pointer" />
-  )}
-</button>
+                  {/* Like Button */}
+                  <button onClick={() => handleLike(startup)}>
+                  {likedStartups.has(startup._id) ? (
+                    <HeartSolid className="w-6 h-6 text-red-500 cursor-pointer" />
+                  ) : (
+                    <HeartOutline className="w-6 h-6 text-gray-400 cursor-pointer" />
+                  )}
+                </button>
 
 
-<button
-  onClick={() => handleInvested(startup)}
-  className={`px-3 py-1 border rounded-lg text-sm transition ${
-    investedStartups.has(startup._id)
-      ? 'bg-green-600 text-white border-green-600'
-      : 'text-green-600 border-green-600'
-  }`}
->
-  {investedStartups.has(startup._id) ? 'Invested' : 'Mark as Invested'}
-</button>
+                <button
+                  onClick={() => handleInvested(startup)}
+                  className={`px-3 py-1 border rounded-lg text-sm transition ${
+                    investedStartups.has(startup._id)
+                      ? 'bg-green-600 text-white border-green-600'
+                      : 'text-green-600 border-green-600'
+                  }`}
+                >
+                  {investedStartups.has(startup._id) ? 'Invested' : 'Mark as Invested'}
+                </button>
 
-</div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-500">No recommendations yet!</p>
-        )}
-      </main>
-    </div>
-  );
-};
+                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-gray-500">No recommendations yet!</p>
+                        )}
+                      </main>
+                    </div>
+                  );
+                };
 
 export default Dashboard;
+
+

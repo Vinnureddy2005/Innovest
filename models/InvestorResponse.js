@@ -11,7 +11,7 @@ const InvestorResponseSchema = new mongoose.Schema({
     required: true,
     lowercase: true,
   },
-  
+  startupId: { type: mongoose.Schema.Types.ObjectId, ref: 'Startup', required: true },
   startupName: {
     type: String,
     required: true,
