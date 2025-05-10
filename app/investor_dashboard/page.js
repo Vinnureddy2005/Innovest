@@ -1,83 +1,23 @@
-// "use client";
 
 
-// import { useSearchParams } from 'next/navigation';
-// import { useEffect, useState } from 'react';
-// import DashboardPage from "../investor_sidebar/page";
 
-// const Dashboard = () => {
-//   const [recommendedStartups, setRecommendedStartups] = useState([]);
-
-
- 
-//   const searchParams = useSearchParams();
-//   const email = searchParams.get('email');
-//   console.log(email)
-
- 
-
-
-//   useEffect(() => {
-//     if (!email) return;
-//     if (email) {
-//       sessionStorage.setItem('email', email);
-//     }
-
-//     const fetchRecommendedStartups = async () => {
-//       try {
-//         const response = await fetch(`/api/recommendations?email=${email}`);
-//         const data = await response.json();
-//         setRecommendedStartups(data);
-//       } catch (error) {
-//         console.error("Error fetching recommendations:", error);
-//       }
-//     };
-
-//     fetchRecommendedStartups();
-//   }, [email]);
-  
-
-//   return (
-    
-//     <div className="dashboard">
-//             <DashboardPage/>
-
-//       <h1>Recommended Startups</h1>
-//       <div className="startup-cards">
-//         {recommendedStartups.length > 0 ? (
-//           recommendedStartups.map(startup => (
-//             <div className="card" key={startup._id}>
-//               <h2>{startup.startupName}</h2>
-//               <p>Industry: {startup.industry}</p>
-//               <p>Stage: {startup.stage}</p>
-//               <p>Funding: {startup.funding}</p>
-//               <a href={startup.website} target="_blank">Visit Website</a>
-//             </div>
-//           ))
-//         ) : (
-//           <p>No recommendations yet!</p>
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Dashboard;
 
 "use client";
-
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import DashboardPage from "../investor_sidebar/page";
 
 const Dashboard = () => {
   const [recommendedStartups, setRecommendedStartups] = useState([]);
+  const [meetingLinks, setMeetingLinks] = useState({});
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
 
   useEffect(() => {
     if (!email) return;
     sessionStorage.setItem('email', email);
+    console.log("inv",email)
 
     const fetchRecommendedStartups = async () => {
       try {
@@ -92,6 +32,156 @@ const Dashboard = () => {
     fetchRecommendedStartups();
   }, [email]);
 
+
+ //const[investor_name,Setinvestor_name]=useState('intial');
+  const fetchName = async (email) => {
+  try {
+    const response = await fetch('/api/inv_name', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message);
+    return data.fullName;
+  } catch (err) {
+    console.error('Error fetching name:', err.message);
+    return null;
+  }
+};
+
+
+const { data: session } = useSession();
+
+
+const [activeStartupId, setActiveStartupId] = useState(null);
+const [selectedDateTime, setSelectedDateTime] = useState({});
+ 
+
+const [loadingMeetings, setLoadingMeetings] = useState({});
+
+
+// const scheduleMeeting = async (startupId, startupName, client_mail,fullName) => {
+
+//   const startTime = selectedDateTime[startupId];
+//   if (!startTime) {
+//     alert("Please select a date and time first.");
+//     return;
+//   }
+
+//   if (!session) {
+//     alert("Please log in to schedule a meeting!");
+//     return;
+//   }
+
+//   const accessToken = session?.accessToken;
+//   if (!accessToken) {
+//     alert("No access token found. Please log in again.");
+//     signOut();
+//     return;
+//   }
+
+// const res = await fetch("/api/schedule-meeting", {
+//   method: "POST",
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+//   body: JSON.stringify({
+//   accessToken,
+//   startDateTime: startTime,
+//   startupName,
+//   client_mail,
+//   investor_name:fullName,
+//   investor_email:email,
+ 
+  
+// }),
+
+// });
+// ;
+    
+
+  
+//   const data = await res.json();
+
+//   console.log(data)
+
+//   if (data.meetingLink) {
+//     setMeetingLinks((prev) => ({
+//       ...prev,
+//       [startupId]: data.meetingLink,
+//     }));
+//     alert("Meeting Scheduled Sucessfully!!")
+//     setActiveStartupId(null); // hide the input after scheduling
+//   } else {
+//     alert("Failed to schedule meeting.");
+//   }
+// };
+
+const scheduleMeeting = async (startupId, startupName, client_mail, fullName) => {
+  const startTime = selectedDateTime[startupId];
+  if (!startTime) {
+    alert("Please select a date and time first.");
+    return;
+  }
+
+  if (!session) {
+    alert("Please log in to schedule a meeting!");
+    return;
+  }
+
+  const accessToken = session?.accessToken;
+  if (!accessToken) {
+    alert("No access token found. Please log in again.");
+    signOut();
+    return;
+  }
+
+  // Start animation
+  setLoadingMeetings((prev) => ({ ...prev, [startupId]: true }));
+
+  // Wait at least 2 seconds
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  try {
+    const res = await fetch("/api/schedule-meeting", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        accessToken,
+        startDateTime: startTime,
+        startupName,
+        client_mail,
+        investor_name: fullName,
+        investor_email: email,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.meetingLink) {
+      setMeetingLinks((prev) => ({
+        ...prev,
+        [startupId]: data.meetingLink,
+      }));
+      alert("Meeting Scheduled Successfully!!");
+      setActiveStartupId(null);
+    } else {
+      alert("Failed to schedule meeting.");
+    }
+  } catch (err) {
+    console.error("Error:", err);
+    alert("An error occurred while scheduling the meeting.");
+  } finally {
+    setLoadingMeetings((prev) => ({ ...prev, [startupId]: false }));
+  }
+};
+
+
   return (
     <div className="min-h-screen flex bg-gray-100">
       {/* Sidebar */}
@@ -103,8 +193,30 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="flex-1 p-6 overflow-y-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Recommended Startups</h1>
-
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-800">Recommended Startups</h1>
+          {!session ? (
+            <button
+              onClick={() => signIn("google")}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              Login with Google
+            </button>
+          ) : (
+            <div className="flex items-center space-x-4">
+              <p className="text-gray-600">Welcome, {session.user.name}!</p>
+              <button
+                onClick={() => signOut()}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+     
+        {/* Startups Grid */}
         {recommendedStartups.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {recommendedStartups.map((startup) => (
@@ -116,6 +228,104 @@ const Dashboard = () => {
                 <p className="mt-2 text-gray-600">📌 Industry: <span className="font-medium">{startup.industry}</span></p>
                 <p className="text-gray-600">🚀 Stage: <span className="font-medium">{startup.stage}</span></p>
                 <p className="text-gray-600">💰 Funding: <span className="font-medium">{startup.funding}</span></p>
+
+                
+               {/* Show Schedule Button OR DateTime Input */}
+                  {activeStartupId === startup._id ? (
+                    <>
+                      <label className="block text-sm text-gray-600 mt-4">Choose Date & Time:</label>
+                      <input
+                        type="datetime-local"
+                        className="mt-1 w-full p-2 border rounded"
+                        onChange={(e) =>
+                          setSelectedDateTime((prev) => ({
+                            ...prev,
+                            [startup._id]: e.target.value,
+                          }))
+                        }
+                      />
+                     
+                    
+
+                       <button
+                        onClick={async () => {
+                          const fullName = await fetchName(email);
+                          console.log('Full Name:', fullName);
+                          scheduleMeeting(startup._id, startup.startupName, startup.client_mail, fullName);
+                        }}
+                        disabled={loadingMeetings[startup._id]}
+                        className={`mt-2 w-full px-4 py-2 rounded-lg transition ${
+                          loadingMeetings[startup._id]
+                            ? "bg-gray-400 text-white cursor-wait"
+                            : "bg-green-600 text-white hover:bg-green-700"
+                        }`}
+                      >
+                        {loadingMeetings[startup._id] ? (
+                          <span className="flex items-center justify-center">
+                            <svg
+                              className="animate-spin h-5 w-5 mr-2 text-white"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v8H4z"
+                              ></path>
+                            </svg>
+                            Scheduling...
+                          </span>
+                        ) : (
+                          "Confirm Meeting"
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => setActiveStartupId(null)}
+                        className="mt-2 w-full px-4 py-2 text-sm bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                   
+                    <button
+                      onClick={() => setActiveStartupId(startup._id)}
+                      disabled={!session}
+                      className={`mt-4 w-full px-4 py-2 rounded-lg transition ${
+                        session
+                          ? "bg-green-600 text-white hover:bg-green-700"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      }`}
+                    >
+                      Schedule Meeting
+                    </button>
+                  )}
+
+                {/* Meeting Link
+                {meetingLinks[startup._id] && (
+                  <p className="mt-2 text-sm">
+                    Meeting Link:{" "}
+                    <a
+                      href={meetingLinks[startup._id]}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline"
+                    >
+                      {meetingLinks[startup._id]}
+                    </a>
+                  </p>
+                )} */}
+
                 <a
                   href={startup.website}
                   target="_blank"

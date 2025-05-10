@@ -26,7 +26,7 @@ export default function Sidebar({ darkMode, handleLogout }) {
         </li>
         <li className="flex items-center gap-2 hover:text-blue-500">
           <Video size={20} />
-          <Link href="/consultations">Consultations</Link>
+          <Link href="/client_consultations">Consultations</Link>
         </li>
         <li className="flex items-center gap-2 hover:text-blue-500">
           <User size={20} />

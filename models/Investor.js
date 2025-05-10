@@ -56,6 +56,9 @@ const InvestorSchema = new mongoose.Schema({
    
   },
 
+  photo: { type: String },
+  validUpto:String,
+
   createdAt: {
     type: Date,
     default: Date.now,
