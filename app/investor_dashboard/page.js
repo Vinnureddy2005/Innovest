@@ -214,7 +214,15 @@ const handleLike = async (startup) => {
 const handleInvested = async (startup) => {
   const investorEmail = sessionStorage.getItem('email');
   const invested = !investedStartups.has(startup.startupName); // toggle
-
+  const alreadyInvested = investedStartups.has(startup._id);
+  if (!alreadyInvested) {
+    const confirmed = window.confirm(
+      "⚠️ Choose this only if you have actually invested.\n\n" +
+      "This will affect your future recommendations and you won't be recommended this startup again.\n\n" +
+      "This action is **undoable**, are you sure you want to proceed?"
+    );
+    if (!confirmed) return;
+  }
   try {
     await fetch('/api/investorResponse', {
       method: 'POST',
