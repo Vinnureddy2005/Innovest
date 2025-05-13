@@ -17,7 +17,7 @@ export async function GET(req) {
     }
 
     // 2. Fetch all proposals
-    const proposals = await Propose.find();
+    const proposals = await Propose.find({}, { file: 0 });
     if (proposals.length === 0) {
       return new Response(JSON.stringify({ message: 'No proposals found' }), { status: 404 });
     }

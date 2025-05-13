@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 import { signIn, signOut, useSession } from "next-auth/react";
@@ -8,13 +8,14 @@ import DashboardPage from "../investor_sidebar/page";
 
 const Dashboard = () => {
   const [recommendedStartups, setRecommendedStartups] = useState([]);
+  const [cfRecommendedStartups, setCFRecommendedStartups] = useState([]);
   const [meetingLinks, setMeetingLinks] = useState({});
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
   const [likedStartups, setLikedStartups] = useState(new Set());
   const [investedStartups, setInvestedStartups] = useState(new Set());
 
-  useEffect(() => {
+useEffect(() => {
     if (!email) return;
     sessionStorage.setItem('email', email);
 
@@ -30,6 +31,30 @@ const Dashboard = () => {
 
     fetchRecommendedStartups();
   }, [email]);
+ 
+useEffect(() => {
+  if (!email) return;
+ sessionStorage.setItem('email', email);
+  const fetchCFRecommendedStartups = async () => {
+    try {
+      const response = await fetch(`/api/cf/?email=${email}`);
+      const data = await response.json();
+      console.log('Collaborative Filtering Startups:', data); // Log data to check
+      setCFRecommendedStartups(data);
+    } catch (error) {
+      console.error("Error fetching collaborative filtering recommendations:", error);
+    }
+  };
+
+  fetchCFRecommendedStartups();
+}, [email]); // Only rerun this effect when `email` changes
+
+// This useEffect will run when `cfRecommendedStartups` changes
+useEffect(() => {
+  console.log("Updated cfRecommendedStartups:", cfRecommendedStartups);
+}, [cfRecommendedStartups]); // This will log the updated state whenever it changes
+
+
 
   useEffect(() => {
     if (!email) return;
@@ -56,7 +81,8 @@ const Dashboard = () => {
   
     fetchInvestorResponses();
   }, [email]);
-  
+ 
+
   
  //const[investor_name,Setinvestor_name]=useState('intial');
   const fetchName = async (email) => {
@@ -278,11 +304,12 @@ const handleInvested = async (startup) => {
             </div>
           )}
         </div>
-     
+ 
+
         {/* Startups Grid */}
-        {recommendedStartups.length > 0 ? (
+        {cfRecommendedStartups.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recommendedStartups.map((startup) => (
+            {cfRecommendedStartups.map((startup) => (
               <div
                 key={startup._id}
                 className="bg-white rounded-2xl shadow-md p-6 border hover:shadow-lg transition-all"
@@ -426,11 +453,10 @@ const handleInvested = async (startup) => {
                         ) : (
                           <p className="text-gray-500">No recommendations yet!</p>
                         )}
+                        
                       </main>
                     </div>
                   );
                 };
 
 export default Dashboard;
-
-
