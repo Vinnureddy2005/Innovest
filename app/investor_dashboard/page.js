@@ -40,8 +40,7 @@ useEffect(() => {
       const response = await fetch(`/api/cf/?email=${email}`);
       const data = await response.json();
       console.log('Collaborative Filtering Startups:', data); // Log data to check
-      setCFRecommendedStartups(data);
-    } catch (error) {
+setCFRecommendedStartups(data.recommendations || []);    } catch (error) {
       console.error("Error fetching collaborative filtering recommendations:", error);
     }
   };
@@ -84,7 +83,6 @@ useEffect(() => {
  
 
   
- //const[investor_name,Setinvestor_name]=useState('intial');
   const fetchName = async (email) => {
   try {
     const response = await fetch('/api/inv_name', {
@@ -174,46 +172,11 @@ const scheduleMeeting = async (startupId, startupName, client_mail, fullName) =>
     setLoadingMeetings((prev) => ({ ...prev, [startupId]: false }));
   }
 };
-// const handleLike = async (startup) => {
-//   const investorEmail = sessionStorage.getItem('email');
-//   const liked = !likedStartups.has(startup._id); 
-
-//   try {
-//     await fetch('/api/investorResponse', {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({
-//         email: investorEmail,
-//         startupId: startup._id,
-//         startupName: startup.startupName,
-//         liked,
-//       }),
-//     });
-
-//     setLikedStartups((prev) => {
-//       const newSet = new Set(prev);
-//       liked ? newSet.add(startup._id) : newSet.delete(startup._id);
-//       return newSet;
-//     });
-//   } catch (error) {
-//     console.error("Error updating like:", error);
-//   }
-// };
-
 const handleLike = async (startup) => {
   const investorEmail = sessionStorage.getItem('email');
-  if (!investorEmail) return;
+  const liked = !likedStartups.has(startup._id); 
 
   try {
-    // Step 1: Fetch the investor response for the current startup
-    const res = await fetch(`/api/investorResponse?email=${investorEmail}&startupId=${startup._id}`);
-    const data = await res.json();
-
-    // Check if the response exists for this startup and investor
-    const existingResponse = data.length > 0 ? data[0] : null;
-    const alreadyLiked = existingResponse ? existingResponse.liked : false;
-
-    // Step 2: Send updated like status to the backend
     await fetch('/api/investorResponse', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -221,17 +184,15 @@ const handleLike = async (startup) => {
         email: investorEmail,
         startupId: startup._id,
         startupName: startup.startupName,
-        liked: !alreadyLiked,  // Toggle based on current status
+        liked,
       }),
     });
 
-    // Step 3: Update UI state
     setLikedStartups((prev) => {
       const newSet = new Set(prev);
-      !alreadyLiked ? newSet.add(startup._id) : newSet.delete(startup._id);
+      liked ? newSet.add(startup._id) : newSet.delete(startup._id);
       return newSet;
     });
-
   } catch (error) {
     console.error("Error updating like:", error);
   }
@@ -270,6 +231,12 @@ const handleInvested = async (startup) => {
     console.error("Error updating invested:", error);
   }
 };
+const allRecommendedStartups = [...recommendedStartups, ...cfRecommendedStartups];
+
+// Remove duplicates by _id
+const uniqueStartups = Array.from(
+  new Map(allRecommendedStartups.map(startup => [startup._id, startup])).values()
+);
 
   return (
     <div className="min-h-screen flex bg-gray-100">
@@ -307,9 +274,9 @@ const handleInvested = async (startup) => {
  
 
         {/* Startups Grid */}
-        {cfRecommendedStartups.length > 0 ? (
+        {uniqueStartups.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {cfRecommendedStartups.map((startup) => (
+            {uniqueStartups.map((startup) => (
               <div
                 key={startup._id}
                 className="bg-white rounded-2xl shadow-md p-6 border hover:shadow-lg transition-all"
@@ -401,20 +368,7 @@ const handleInvested = async (startup) => {
                     </button>
                   )}
 
-                {/* Meeting Link
-                {meetingLinks[startup._id] && (
-                  <p className="mt-2 text-sm">
-                    Meeting Link:{" "}
-                    <a
-                      href={meetingLinks[startup._id]}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline"
-                    >
-                      {meetingLinks[startup._id]}
-                    </a>
-                  </p>
-                )} */}
+              
 
                 <a
                   href={startup.website}
@@ -453,8 +407,7 @@ const handleInvested = async (startup) => {
                         ) : (
                           <p className="text-gray-500">No recommendations yet!</p>
                         )}
-                        
-                      </main>
+      </main>
                     </div>
                   );
                 };
