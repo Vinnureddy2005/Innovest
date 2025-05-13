@@ -3,31 +3,83 @@
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import Sidebar from '../client_sidebar/page';
 
 export default function DashboardPage() {
   const router = useRouter(); 
   const searchParams = useSearchParams();
-  const email = searchParams.get('email');
-  console.log(email)
+  const emailFromQuery = searchParams.get('email');
 
-  if (email) {
-    sessionStorage.setItem('email', email);
-  }
+  const [clientMail, setClientMail] = useState('');
+
+  const [meetings, setMeetings] = useState([]);
+  const [proposalsCount, setProposalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  // ✅ Set email to sessionStorage in a safe useEffect
+  useEffect(() => {
+    if (emailFromQuery) {
+      sessionStorage.setItem('email', emailFromQuery);
+      setClientMail(emailFromQuery);
+    } else {
+      const stored = sessionStorage.getItem('email');
+      if (stored) setClientMail(stored);
+    }
+  }, [emailFromQuery]);
+
+  // ✅ Fetch meetings
+  useEffect(() => {
+    if (!clientMail) return;
+
+    const fetchMeetings = async () => {
+      try {
+        const res = await fetch('/api/get-client-meetings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ client_mail: clientMail }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to fetch meetings');
+        setMeetings(data);
+      } catch (err) {
+        console.error(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMeetings();
+  }, [clientMail]);
+
+  // ✅ Fetch proposals
+  useEffect(() => {
+    if (!clientMail) return;
+
+    fetch(`/api/propose_email/${clientMail}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log("Proposals data:", data); 
+        setProposalCount(data.length);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to fetch proposals:', err);
+        setLoading(false);
+      });
+  }, [clientMail]);
 
   const handleLogout = () => {
     sessionStorage.removeItem('email');
     localStorage.removeItem('authToken'); 
-
     router.push('/'); 
   };
 
   return (
     <div className={`min-h-screen flex`}>
-      
       {/* Sidebar */}
-      <Sidebar email={email} handleLogout={handleLogout} />
-
+      <Sidebar email={clientMail} handleLogout={handleLogout} />
 
       {/* Main Content */}
       <div className="flex-1 p-10">
@@ -49,11 +101,11 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <div className="bg-blue-100 dark:bg-blue-800 p-6 rounded-xl shadow-md">
             <h2 className="text-xl font-semibold mb-2">Total Proposals</h2>
-            <p className="text-3xl font-bold">8</p>
+            <p className="text-3xl font-bold">{proposalsCount}</p>
           </div>
           <div className="bg-green-100 dark:bg-green-800 p-6 rounded-xl shadow-md">
             <h2 className="text-xl font-semibold mb-2">Upcoming Consultations</h2>
-            <p className="text-3xl font-bold">3</p>
+            <p className="text-3xl font-bold">{meetings.length}</p>
           </div>
         </div>
 
@@ -68,7 +120,6 @@ export default function DashboardPage() {
             <li>Update your <strong>Profile</strong> as needed to keep things fresh and professional.</li>
           </ol>
         </div>
-
       </div>
     </div>
   );
