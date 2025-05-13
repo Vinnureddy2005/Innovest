@@ -5,10 +5,8 @@ import { NextResponse } from 'next/server';
 // Handle GET requests
 export async function GET(req) {
   try {
-    // Establish a connection to the MongoDB database
     await connectToDB();
 
-    // Fetch all proposals from the Propose collection
     const proposals = await Propose.find({}, { file: 0 }).sort({ createdAt: -1 }); // Sort by creation date (most recent first)
 
     // Respond with the list of proposals
