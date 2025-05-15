@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 export default function SignupTabs() {
   const router = useRouter();
@@ -25,6 +27,8 @@ export default function SignupTabs() {
     philosophy: '',
     membershipPlan: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,15 +46,60 @@ export default function SignupTabs() {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match.');
-      return;
-    }
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (formData.password !== formData.confirmPassword) {
+    alert('Passwords do not match.');
+    return;
+  }
+
+  setLoading(true);
+  setError('');
+
+  try {
     localStorage.setItem('signupData', JSON.stringify(formData));
-    router.push('/payment_investor');
-  };
+
+    // Select API endpoint based on membership plan
+    const apiRoute =
+      formData.membershipPlan === 'pro'
+        ? '/api/investor_payment/pro'
+        : formData.membershipPlan === 'basic'
+        ? '/api/investor_payment/basic'
+        : null;
+
+    if (!apiRoute) {
+      throw new Error('Please select a valid membership plan.');
+    }
+
+    const res = await fetch(apiRoute, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to create Stripe session');
+    }
+
+    const { sessionId } = await res.json();
+
+    const stripe = await stripePromise;
+    const { error } = await stripe.redirectToCheckout({ sessionId });
+
+    if (error) {
+      setError(error.message);
+    }
+  } catch (err) {
+    setError(err.message || 'Something went wrong');
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   const industries = [
     "Technology", "Healthcare", "Finance", "Education", "Retail and E-commerce",
@@ -201,12 +250,16 @@ export default function SignupTabs() {
                   </div>
 
                   <div className="flex justify-center pt-4">
-                    <button
-                      type="submit"
-                      className="w-full sm:w-64 bg-transparent border border-gray-500 text-gray-700 font-bold py-2 px-4 rounded-xl shadow hover:bg-gray-100 transition-transform transform hover:scale-105 duration-300"
-                    >
-                      Proceed to Payment
-                    </button>
+                   <button
+  type="submit"
+  disabled={loading}
+  className="w-full sm:w-64 bg-transparent border border-gray-500 text-gray-700 font-bold py-2 px-4 rounded-xl shadow hover:bg-gray-100 transition-transform transform hover:scale-105 duration-300"
+>
+  {loading ? 'Redirecting...' : 'Proceed to Payment'}
+</button>
+
+                          {error && <p className="text-red-600 mt-4">{error}</p>}
+
                   </div>
                 </form>
               </>
@@ -223,3 +276,25 @@ export default function SignupTabs() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
