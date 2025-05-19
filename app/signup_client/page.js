@@ -2,14 +2,17 @@
 
 'use client';
 
+import { loadStripe } from '@stripe/stripe-js';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 export default function PremiumSignup() {
   const router = useRouter();
-  
+  const [loading, setLoading] = useState(false);
+const [error, setError] = useState('');
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -24,47 +27,36 @@ export default function PremiumSignup() {
   };
 
   
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   if (formData.password !== formData.confirmPassword) {
-  //     alert('Passwords do not match.');
-  //     return;
-  //   }
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-  //   // Save form data in local storage before navigating
-  //   localStorage.setItem('signupData', JSON.stringify(formData));
+  if (formData.password !== formData.confirmPassword) {
+    alert('Passwords do not match.');
+    return;
+  }
 
-  //   // Navigate to payment page
-  //   router.push('/payment-client');
-  // };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match.');
-      return;
-    }
-  
-    // Calculate validUpto date based on membership plan
     const currentDate = new Date();
     let validUptoDate = new Date(currentDate);
-  
+
     if (formData.membershipPlan === 'basic') {
       validUptoDate.setMonth(validUptoDate.getMonth() + 6);
     } else if (formData.membershipPlan === 'pro') {
       validUptoDate.setMonth(validUptoDate.getMonth() + 12);
+    } else {
+      throw new Error('Please select a valid membership plan.');
     }
-  
+
     const updatedFormData = {
       ...formData,
-      validUpto: validUptoDate.toISOString().split('T')[0], // format as "YYYY-MM-DD"
+      validUpto: validUptoDate.toISOString().split('T')[0], // "YYYY-MM-DD"
     };
-  
-    // Save form data in local storage before navigating
+
+   
     localStorage.setItem('signupData', JSON.stringify(updatedFormData));
-  
-    // Navigate to payment page
     router.push('/payment-client');
-  };
+ 
+};
+
   
 
   return (
@@ -123,10 +115,15 @@ export default function PremiumSignup() {
               
               <button
   type="submit"
-  className="w-100 ml-10 bg-transparent border border-gray-500 text-gray-700 font-bold py-3 px-6 rounded-2xl shadow-lg hover:bg-gray-100 transition-transform transform hover:scale-105 duration-300"
+  disabled={loading}
+  className={`w-100 ml-10 border font-bold py-3 px-6 rounded-2xl shadow-lg transition-transform transform duration-300
+    ${loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-transparent border-gray-500 text-gray-700 hover:bg-gray-100 hover:scale-105'}`}
 >
-                Proceed to Payment
-              </button>
+  {loading ? 'Processing...' : 'Proceed to Payment'}
+</button>
+
+{error && <p className="text-red-600 mt-2">{error}</p>}
+
             </form>
           </motion.div>
         </div>

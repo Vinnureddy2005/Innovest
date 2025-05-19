@@ -6,13 +6,9 @@ const ClientSchema = new mongoose.Schema({
   phone: String,
   password: String,
   membershipPlan: String,
-  transactionId:Number,
+  transactionId:String,
 
-  // Hidden field
-  access: {
-    type: Boolean,
-    default: false
-  },
+
   photo: { type: String },
   validUpto:String,
 });

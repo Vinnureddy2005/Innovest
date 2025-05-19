@@ -237,7 +237,6 @@ const allRecommendedStartups = [...recommendedStartups, ...cfRecommendedStartups
 const uniqueStartups = Array.from(
   new Map(allRecommendedStartups.map(startup => [startup._id, startup])).values()
 );
-
 const [loading, setLoading] = useState(false);
 const [proposals, setProposals] = useState([]);
 
@@ -274,25 +273,6 @@ const [isPopupOpen, setIsPopupOpen] = useState(false);
     setLoading(false);
   }
 };
-
-// const PopupModal = ({ fileUrl, onClose }) => (
-//   <div className="fixed inset-0 flex justify-center items-center z-50">
-//     <div className="bg-white bg-opacity-90 p-2 rounded-lg border border-gray-300">
-//       <button 
-//         onClick={onClose} 
-//         className="absolute top-2 right-2 text-red-500"
-//       >
-//         X
-//       </button>
-//       <iframe 
-//         src={fileUrl} 
-//         className="w-[500px] h-[600px]" 
-//         title="File Preview"
-//       />
-//     </div>
-//   </div>
-// );
-
 const PopupModal = ({ fileUrl, onClose }) => (
   <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-30">
     <div className="rounded-lg border border-gray-300" style={{ width: '1000px', height: '842px' }}>
@@ -310,12 +290,6 @@ const PopupModal = ({ fileUrl, onClose }) => (
     </div>
   </div>
 );
-
-
-
-
-
-
   return (
     <div className="min-h-screen flex bg-gray-100">
       {/* Sidebar */}
@@ -363,14 +337,12 @@ const PopupModal = ({ fileUrl, onClose }) => (
                 <p className="mt-2 text-gray-600">📌 Industry: <span className="font-medium">{startup.industry}</span></p>
                 <p className="text-gray-600">🚀 Stage: <span className="font-medium">{startup.stage}</span></p>
                 <p className="text-gray-600">💰 Funding: <span className="font-medium">{startup.funding}</span></p>
-                <button 
+<button 
                   onClick={() => handleView(startup._id)}
                   className="px-1 py-1 bg-blue-600 text-white rounded-sm shadow hover:bg-blue-700 transition duration-200"
                 >
                   View
                 </button>
-
-
                 
                {/* Show Schedule Button OR DateTime Input */}
                   {activeStartupId === startup._id ? (

@@ -29,7 +29,6 @@ export async function POST(req) {
       password,
       membershipPlan,
       transactionId,
-      access: false ,
       validUpto
     });
     

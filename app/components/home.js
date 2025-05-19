@@ -17,7 +17,7 @@ export default function Home() {
       <div>
       <img 
   src="/images/home-1.png" 
-  className="absolute bottom-20 right-4 md:right-10 w-3/4 sm:w-2/4 max-w-full h-auto object-contain opacity-90" 
+  className="absolute bottom-50 right-4 md:right-10 w-3/4 sm:w-2/4 max-w-full h-auto object-contain opacity-90" 
 />
 
       </div>

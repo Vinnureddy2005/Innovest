@@ -56,6 +56,9 @@ const InvestorSchema = new mongoose.Schema({
    type:String
    
   },
+  transactionId:String,
+  validUpto:String,
+  photo: { type: String },
 
   createdAt: {
     type: Date,

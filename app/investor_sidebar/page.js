@@ -25,7 +25,7 @@ export default function Sidebar({ darkMode, handleLogout }) {
           </Link>
         </li>
         <li className="flex items-center gap-2 hover:text-blue-500">
-          <Link href="/proposals">All Proposals</Link>
+          <Link href={`/proposals?email=${encodeURIComponent(email)}`}>All Proposals</Link>
         </li>
         <li className="flex items-center gap-2 hover:text-blue-500">
           <Video size={20} />

@@ -10,7 +10,7 @@ export async function POST(req) {
       fullName, email, phone, password, confirmPassword,
       companyName, linkedIn, investmentFocus, preferredIndustries,
       investmentSize, pastInvestments, philosophy,
-      membershipPlan
+      membershipPlan,validUpto,transactionId
     } = data;
 
     if (password !== confirmPassword) {
@@ -36,7 +36,9 @@ export async function POST(req) {
       investmentSize,
       pastInvestments,
       philosophy,
-      membershipPlan
+      membershipPlan,
+      transactionId,
+      validUpto
     });
 
     await newInvestor.save();

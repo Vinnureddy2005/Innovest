@@ -1,20 +1,23 @@
 import { connectToDB } from '@/lib/mongodb';
-import Propose from '@/models/propose'; // Your Mongoose model
+import Propose from '@/models/propose';
 import { NextResponse } from 'next/server';
 
-// Handle GET requests
 export async function GET(req) {
   try {
     await connectToDB();
 
-    const proposals = await Propose.find({}, { file: 0 }).sort({ createdAt: -1 }); // Sort by creation date (most recent first)
+    const { searchParams } = new URL(req.url);
+    const email = searchParams.get('email');
 
-    // Respond with the list of proposals
+    if (!email) {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    }
+
+    const proposals = await Propose.find().sort({ createdAt: -1 });
+
     return NextResponse.json(proposals, { status: 200 });
   } catch (error) {
     console.error('Error fetching proposals:', error);
-
-    // Respond with an error message
     return NextResponse.json({ error: 'Failed to fetch proposals' }, { status: 500 });
   }
 }

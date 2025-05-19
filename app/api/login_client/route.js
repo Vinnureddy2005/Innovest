@@ -55,9 +55,6 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Incorrect password' }, { status: 401 });
     }
 
-    if (!user.access) {
-      return NextResponse.json({ error: 'Access denied. Awaiting approval.' }, { status: 403 });
-    }
 
     // Create JWT payload
     const payload = {
