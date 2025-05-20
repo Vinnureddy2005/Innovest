@@ -5,8 +5,8 @@ import Client from '@/models/Client';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 
-// Secret key for signing JWT
-const JWT_SECRET = process.env.JWT_SECRET ; // Replace with environment variable in production
+
+const JWT_SECRET = process.env.JWT_SECRET ; 
 
 export async function POST(req) {
   try {
@@ -29,10 +29,10 @@ export async function POST(req) {
     const payload = {
       id: user._id,
       email: user.email,
-    };
+    }; 
 
-    // Sign the token
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' }); // Token valid for 1 hour
+  
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' }); 
     console.log('Generated JWT Token:', token);
 
     return NextResponse.json({ 

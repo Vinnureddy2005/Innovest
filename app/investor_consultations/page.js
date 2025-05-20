@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Sidebar from '../investor_sidebar/page'; // create investor_sidebar if needed
+import Sidebar from '../investor_sidebar/page';
 
 export default function InvestorMeetingsPage() {
   const router = useRouter();
@@ -64,7 +64,7 @@ export default function InvestorMeetingsPage() {
               >
                 <h3 className="text-xl font-bold mb-2">{m.startupName}</h3>
                 <p className="text-sm text-gray-600 mb-1">
-                  <strong>Client Name:</strong> {m.client_name}
+                   <strong>Client Name:</strong> {m.client_name}
                 </p>
                 <p className="text-sm text-gray-600 mb-1">
                   <strong>Client:</strong> {m.client_mail}
