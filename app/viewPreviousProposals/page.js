@@ -98,7 +98,6 @@ export default function ViewPreviousProposals() {
         return;
       }
     
-      // If validation passes, add file to final formData
       formData.append('file', formValues.file);
     }
     

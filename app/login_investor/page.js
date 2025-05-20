@@ -8,6 +8,7 @@ export default function LoginForm() {
   const [error, setError] = useState('');
   const router = useRouter(); 
 
+
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -28,6 +29,7 @@ export default function LoginForm() {
       router.push(`/investor_dashboard?email=${encodeURIComponent(formData.email)}`);
 
     } catch (err) {
+      console.log(err)
       setError(err.message);
     }
   };

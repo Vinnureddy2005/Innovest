@@ -1,4 +1,4 @@
-'use client';  // If you're using client-side rendering in the component
+'use client';  
 
 import { useEffect, useState } from 'react';
 
@@ -7,7 +7,7 @@ export default function RecommendationsPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Replace with the actual investor ID from your authentication or context
+    
     const investorId = 'your-investor-id-here'; 
 
     // Fetch recommendations from the API route
