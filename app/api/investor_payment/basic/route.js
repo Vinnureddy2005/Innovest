@@ -3,9 +3,10 @@ import Stripe from 'stripe';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2023-10-16',
 });
-const domain = process.env.NEXTAUTH_URL;
+
 
 export async function POST(req) {
+  console.log(req)
   try {
     const session = await stripe.checkout.sessions.create({
   mode: 'subscription',

@@ -45,6 +45,7 @@ export default function ProposeIdeaPage() {
     '$5M+'
   ];
   const handleChange = (e, any) => {
+    console.log(any)
     const { name, value, type, checked, files } = e.target;
     if (type === 'checkbox') {
       setFormData({ ...formData, [name]: checked });
@@ -59,6 +60,7 @@ export default function ProposeIdeaPage() {
   const [validationTimeout, setValidationTimeout] = useState(false); // Timer state for simulation
   const [uploadedFile, setUploadedFile] = useState(null);
   const [fileName, setFileName] = useState("");
+  console.log(setValidationTimeout)
 
 
   const handleNext = () => setStep(prev => prev + 1);

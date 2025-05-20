@@ -263,7 +263,6 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Sidebar from '../investor_sidebar/page';
-
 export default function InvestorEditProfile() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);

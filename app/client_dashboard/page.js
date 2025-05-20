@@ -16,6 +16,7 @@ export default function DashboardPage() {
   const [meetings, setMeetings] = useState([]);
   const [proposalsCount, setProposalCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  console.log(loading)
 
   // ✅ Set email to sessionStorage in a safe useEffect
   useEffect(() => {

@@ -2,17 +2,17 @@
 
 'use client';
 
-import { loadStripe } from '@stripe/stripe-js';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+
 export default function PremiumSignup() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 const [error, setError] = useState('');
-
+ console.log(setLoading)
+ console.log(setError)
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',

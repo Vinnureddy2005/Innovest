@@ -154,7 +154,7 @@ export default function ClientEditProfile() {
 
               {/* Profile Image */}
               {previewPic ? (
-                <img
+                <img 
                   src={previewPic}
                   alt="Profile"
                   className="w-28 h-28 rounded-full object-cover border-4 border-orange-400 shadow-md"

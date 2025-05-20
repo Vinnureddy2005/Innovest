@@ -9,7 +9,7 @@ import SidebarPage from "../investor_sidebar/page";
 const Proposals = () => {
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [meetingLinks, setMeetingLinks] = useState({});
+  
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
   const [likedStartups, setLikedStartups] = useState(new Set());
@@ -33,7 +33,7 @@ const [showInvested, setShowInvested] = useState(false);
     };
 
     fetchProposals();
-  }, []);
+  }, [email]);
 
  useEffect(() => {
     if (!email) return;

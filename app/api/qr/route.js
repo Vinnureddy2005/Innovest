@@ -19,6 +19,7 @@ export async function GET(req) {
     const qrCode = await QRCode.toDataURL(upiLink);
     return NextResponse.json({ qrCode }, { status: 200 });
   } catch (err) {
+    console.log(err)
     return NextResponse.json({ error: "QR Code generation failed" }, { status: 500 });
   }
 }
