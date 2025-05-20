@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 
 export default function contact() {
   return (
@@ -16,9 +15,9 @@ export default function contact() {
             Contact Innovest Team
           </h1>
           <p className="text-gray-700 mb-12">
-            Have a question, suggestion, or want to collaborate? We'd love to
-            hear from you!
+            {"Have a question, suggestion, or want to collaborate? We'd love to hear from you!"}
           </p>
+
 
           <form className="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-lg grid gap-6">
             <input

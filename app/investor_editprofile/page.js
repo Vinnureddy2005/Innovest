@@ -260,10 +260,10 @@
 
 'use client';
 
+import Image from "next/image";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Sidebar from '../investor_sidebar/page';
-
 export default function InvestorEditProfile() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -371,7 +371,7 @@ export default function InvestorEditProfile() {
                 ✏️
               </button>
               {previewPic ? (
-                <img src={previewPic} alt="Profile" className="w-28 h-28 rounded-full object-cover border-4 border-orange-400 shadow-md" />
+                <Image src={previewPic} alt="Profile" className="w-28 h-28 rounded-full object-cover border-4 border-orange-400 shadow-md" />
               ) : (
                 <div className="w-28 h-28 rounded-full bg-gray-300 flex items-center justify-center border-4 border-orange-400 shadow-md">
                   <span className="text-gray-600">No Image</span>

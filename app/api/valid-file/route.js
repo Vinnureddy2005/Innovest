@@ -70,6 +70,7 @@ import path from 'path';
 import pdfExtract from 'pdf-extraction';
 
 export async function POST(req) {
+   console.log(req)
   try {
     
     const uploadPath = path.join(process.cwd(), 'public', 'uploads', 'temp.pdf');

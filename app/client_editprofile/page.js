@@ -2,6 +2,7 @@
 
 'use client';
 
+import Image from "next/image";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Sidebar from '../client_sidebar/page';
@@ -154,7 +155,7 @@ export default function ClientEditProfile() {
 
               {/* Profile Image */}
               {previewPic ? (
-                <img
+                <Image 
                   src={previewPic}
                   alt="Profile"
                   className="w-28 h-28 rounded-full object-cover border-4 border-orange-400 shadow-md"

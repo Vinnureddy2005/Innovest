@@ -18,6 +18,7 @@ export async function POST(req) {
 
     return new Response(JSON.stringify(upcomingMeetings), { status: 200 });
   } catch (err) {
+    console.log(err)
     return new Response(JSON.stringify({ error: 'Failed to fetch meetings' }), {
       status: 500,
     });

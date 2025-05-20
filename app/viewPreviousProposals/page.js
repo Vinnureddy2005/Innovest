@@ -58,7 +58,7 @@ export default function ViewPreviousProposals() {
       setFormValues(prev => ({ ...prev, [name]: value }));
     }
   };
-  const[filePath,setFilePath]=useState("");
+  
   const handleSave = async (id) => {
     const formData = new FormData();
     formData.append('stage', formValues.stage);
