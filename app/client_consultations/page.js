@@ -81,6 +81,9 @@ export default function ClientMeetingsPage() {
                   <strong>Email:</strong> {m.investor_email}
                 </p>
                 <p className="text-sm text-gray-600 mb-1">
+                  <strong>LinkedIn:</strong> {m.linkedIn}
+                </p>
+                <p className="text-sm text-gray-600 mb-1">
                   <strong>Date:</strong>{' '}
                   {new Date(m.startDateTime).toLocaleDateString()}
                 </p>

@@ -14,6 +14,10 @@ const Invsetor_meetingSchema = new mongoose.Schema({
     type: String, 
     required: true,
   },
+  client_name: {
+    type: String, 
+    required: true,
+  },
   client_mail: {
     type: String, 
     required: true,
@@ -21,6 +25,10 @@ const Invsetor_meetingSchema = new mongoose.Schema({
   investor_name: {
     type: String, 
     required: true,
+  },
+
+  linkedIn:{
+    type:String
   },
   investor_email: {
     type: String, 

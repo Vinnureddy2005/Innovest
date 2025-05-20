@@ -1,6 +1,4 @@
 "use client"
-import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -96,12 +94,32 @@ useEffect(() => {
     const data = await response.json();
 
     if (!response.ok) throw new Error(data.message);
-    return data.fullName;
+    return data;
   } catch (err) {
     console.error('Error fetching name:', err.message);
     return null;
   }
 };
+
+
+
+const fetchClientData = async (email) => {
+      try {
+      
+
+        const res = await fetch(`/api/client_profile?email=${email}`);
+        if (!res.ok) {
+          console.error('Failed to fetch client data');
+          return;
+        }
+
+        const data = await res.json();
+        return data.client;
+
+      } catch (error) {
+        console.error('Error fetching client data:', error);
+      }
+    };
 
 
 const { data: session } = useSession();
@@ -114,7 +132,7 @@ const [selectedDateTime, setSelectedDateTime] = useState({});
 const [loadingMeetings, setLoadingMeetings] = useState({});
 
 
-const scheduleMeeting = async (startupId, startupName, client_mail, fullName) => {
+const scheduleMeeting = async (startupId, startupName,client_name, client_mail, fullName, linkedIn) => {
   const startTime = selectedDateTime[startupId];
   if (!startTime) {
     alert("Please select a date and time first.");
@@ -147,8 +165,10 @@ const scheduleMeeting = async (startupId, startupName, client_mail, fullName) =>
         accessToken,
         startDateTime: startTime,
         startupName,
+        client_name,
         client_mail,
         investor_name: fullName,
+        linkedIn,
         investor_email: email,
       }),
     });
@@ -326,25 +346,65 @@ const PopupModal = ({ fileUrl, onClose }) => (
  
 
         {/* Startups Grid */}
-        {uniqueStartups.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {uniqueStartups.map((startup) => (
-              <div
-                key={startup._id}
-                className="bg-white rounded-2xl shadow-md p-6 border hover:shadow-lg transition-all"
-              >
-                <h2 className="text-xl font-semibold text-blue-700">{startup.startupName}</h2>
-                <p className="mt-2 text-gray-600">📌 Industry: <span className="font-medium">{startup.industry}</span></p>
-                <p className="text-gray-600">🚀 Stage: <span className="font-medium">{startup.stage}</span></p>
-                <p className="text-gray-600">💰 Funding: <span className="font-medium">{startup.funding}</span></p>
-<button 
-                  onClick={() => handleView(startup._id)}
-                  className="px-1 py-1 bg-blue-600 text-white rounded-sm shadow hover:bg-blue-700 transition duration-200"
-                >
-                  View
-                </button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+          {uniqueStartups.map((startup) => (
+            <div
+              key={startup._id}
+              className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex flex-col gap-3 text-sm"
+            >
+              {/* Logo + Name */}
+              <div className="flex items-center gap-3">
                 
-               {/* Show Schedule Button OR DateTime Input */}
+                <div>
+                  <h3 className="font-semibold text-gray-800">{startup.startupName}</h3>
+                  <p className="text-gray-500 text-xs">{startup.industry}</p>
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div className="flex flex-wrap gap-1">
+                <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs">Stage: {startup.stage}</span>
+                <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs">Funding: {startup.funding}</span>
+              </div>
+
+              {/* Website */}
+              <a
+                href={startup.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline text-xs"
+              >
+                🌐 Visit Site
+              </a>
+
+              {/* Buttons */}
+              <div className="flex items-center justify-between gap-2">
+                          <button
+                    onClick={() => handleView(startup._id)}
+                    className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full"
+                  >
+                    View
+                  </button>
+                  <button
+                  onClick={() => handleInvested(startup)}
+                  className={`px-3 py-1 border rounded-lg text-sm transition ${
+                    investedStartups.has(startup._id)
+                      ? 'bg-green-600 text-white border-green-600'
+                      : 'text-green-600 border-green-600'
+                  }`}
+                >
+                  {investedStartups.has(startup._id) ? 'Invested' : 'Mark as Invested'}
+                </button>
+
+                  <button
+                    onClick={() => handleLike(startup)}
+                    className="text-red-500"
+                  >
+                    {likedStartups.has(startup._id) ? "❤️" : "🤍"}
+                  </button>
+                </div>
+
+                {/* Schedule Meeting */}
                   {activeStartupId === startup._id ? (
                     <>
                       <label className="block text-sm text-gray-600 mt-4">Choose Date & Time:</label>
@@ -363,9 +423,13 @@ const PopupModal = ({ fileUrl, onClose }) => (
 
                        <button
                         onClick={async () => {
-                          const fullName = await fetchName(email);
-                          console.log('Full Name:', fullName);
-                          scheduleMeeting(startup._id, startup.startupName, startup.client_mail, fullName);
+                          const data = await fetchName(email);
+                          const client_data= await fetchClientData(startup.client_mail);
+                          console.log("client name",client_data.fullName)
+                          console.log('Full Name:', data.fullName);
+                          console.log('linkedin:', data.linkedIn);
+                          console.log('photo:', data.photo);
+                          scheduleMeeting(startup._id, startup.startupName,client_data.fullName, startup.client_mail, data.fullName,data.linkedIn);
                         }}
                         disabled={loadingMeetings[startup._id]}
                         className={`mt-2 w-full px-4 py-2 rounded-lg transition ${
@@ -423,46 +487,11 @@ const PopupModal = ({ fileUrl, onClose }) => (
                     >
                       Schedule Meeting
                     </button>
-                  )}
-              
-
-                <a
-                  href={startup.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                >
-                  Visit Website
-                </a>
-                <div className="mt-4 flex gap-4 items-center">
-                  {/* Like Button */}
-                  <button onClick={() => handleLike(startup)}>
-                  {likedStartups.has(startup._id) ? (
-                    <HeartSolid className="w-6 h-6 text-red-500 cursor-pointer" />
-                  ) : (
-                    <HeartOutline className="w-6 h-6 text-gray-400 cursor-pointer" />
-                  )}
-                </button>
-
-
-                <button
-                  onClick={() => handleInvested(startup)}
-                  className={`px-3 py-1 border rounded-lg text-sm transition ${
-                    investedStartups.has(startup._id)
-                      ? 'bg-green-600 text-white border-green-600'
-                      : 'text-green-600 border-green-600'
-                  }`}
-                >
-                  {investedStartups.has(startup._id) ? 'Invested' : 'Mark as Invested'}
-                </button>
-
+                  )} 
+                    </div>
+                  ))}
                 </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-gray-500">No recommendations yet!</p>
-                        )}
+
 
 
                       {isPopupOpen && (

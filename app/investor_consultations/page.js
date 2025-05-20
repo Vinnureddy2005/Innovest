@@ -64,6 +64,9 @@ export default function InvestorMeetingsPage() {
               >
                 <h3 className="text-xl font-bold mb-2">{m.startupName}</h3>
                 <p className="text-sm text-gray-600 mb-1">
+                  <strong>Client Name:</strong> {m.client_name}
+                </p>
+                <p className="text-sm text-gray-600 mb-1">
                   <strong>Client:</strong> {m.client_mail}
                 </p>
                 <p className="text-sm text-gray-600 mb-1">

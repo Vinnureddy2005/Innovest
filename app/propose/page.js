@@ -85,7 +85,7 @@ export default function ProposeIdeaPage() {
   
       if (res.ok) {
         alert('Idea submitted successfully!');
-        router.push('/dashboard');
+        router.push(`/client_dashboard?email=${encodeURIComponent(email)}`)
       } else {
         alert(result.error || 'Something went wrong');
       }

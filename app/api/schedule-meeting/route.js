@@ -1,68 +1,5 @@
 
 
-// import { google } from "googleapis";
-
-// const calendar = google.calendar("v3");
-
-// export async function POST(request) {
-//   try {
-//     const body = await request.json();
-//     const { accessToken, startDateTime } = body;
-
-    
-
-//     if (!accessToken || !startDateTime) {
-//       return new Response(
-//         JSON.stringify({ error: "Access token and startDateTime are required." }),
-//         { status: 400 }
-//       );
-//     }
-
-//     const auth = new google.auth.OAuth2();
-//     auth.setCredentials({ access_token: accessToken });
-
-//     const start = new Date(startDateTime);
-//     const end = new Date(start.getTime() + 30 * 60 * 1000); // Default to 30 mins
-
-//     const event = {
-//       summary: "Scheduled Meeting",
-//       start: {
-//         dateTime: start.toISOString(),
-//         timeZone: "Asia/Kolkata", // or user-specific
-//       },
-//       end: {
-//         dateTime: end.toISOString(),
-//         timeZone: "Asia/Kolkata",
-//       },
-//       conferenceData: {
-//         createRequest: {
-//           requestId: `req-${Date.now()}`,
-//           conferenceSolutionKey: {
-//             type: "hangoutsMeet",
-//           },
-//         },
-//       },
-//     };
-
-//     const response = await calendar.events.insert({
-//       calendarId: "primary",
-//       resource: event,
-//       conferenceDataVersion: 1,
-//       auth,
-//     });
-
-//     return new Response(JSON.stringify({ meetingLink: response.data.hangoutLink }), {
-//       status: 200,
-//     });
-//   } catch (error) {
-//     console.error("Error scheduling meeting:", error);
-//     return new Response(JSON.stringify({ error: "Failed to schedule meeting" }), {
-//       status: 500,
-//     });
-//   }
-// }
-
-
 import { connectToDB } from '@/lib/mongodb';
 import Meeting from '@/models/Client_Meeting';
 import { google } from "googleapis";
@@ -70,9 +7,9 @@ import { google } from "googleapis";
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { accessToken, startDateTime, startupName, client_mail, investor_name, investor_email } = body;
+    const { accessToken, startDateTime, startupName, client_name,client_mail, investor_name, linkedIn,investor_email } = body;
     console.log(body);
-    if (!accessToken || !startDateTime || !startupName  || !client_mail || !investor_name || !investor_email ) {
+    if (!accessToken || !startDateTime || !startupName  || !client_name|| !client_mail || !investor_name || !investor_email  || !linkedIn) {
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         { status: 400 }
@@ -114,9 +51,11 @@ export async function POST(request) {
       startupName,
       meetingLink,
       startDateTime,
+      client_name,
       client_mail,
       investor_email,
-      investor_name
+      investor_name,
+      linkedIn
     });
 
     await newMeeting.save();
