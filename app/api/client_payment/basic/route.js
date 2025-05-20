@@ -16,8 +16,7 @@ export async function POST(req) {
       quantity: 1,
     },
   ],
-  // success_url: `${domain}/success`,
-  // cancel_url: `${domain}/cancel`,
+ 
    success_url: `http://localhost:3000/payment-client?success=true&session_id={CHECKOUT_SESSION_ID}`,
   cancel_url: `http://localhost:3000/payment-client?cancelled=true`,
 });

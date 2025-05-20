@@ -8,7 +8,6 @@ export async function GET(request, { params }) {
   try {
     await connectToDB(); // Ensure database connection
 
-    // Fetch the document by ID
     const proposal = await Propose.findById(params.id);
     if (!proposal || !proposal.file) {
       return res.status(404).json({ message: 'File not found' });
