@@ -548,16 +548,14 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen flex bg-gray-100">
-      {/* Sidebar */}
       <aside className="w-64 bg-white border-r shadow-md hidden md:block">
         <div className="sticky top-0 h-screen overflow-y-auto p-4">
           <DashboardPage />
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 p-6 overflow-y-auto">
-        {/* Header */}
+    
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Recommended Startups</h1>
           {!session ? (

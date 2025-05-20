@@ -34,7 +34,7 @@ export async function POST(request) {
           requestId: `req-${Date.now()}`,
           conferenceSolutionKey: { type: "hangoutsMeet" },
         },
-      },
+      }, 
     };
 
     const response = await calendar.events.insert({
