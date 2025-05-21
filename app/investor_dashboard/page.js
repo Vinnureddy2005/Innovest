@@ -358,181 +358,101 @@ console.log(scheduledStartups)
                   View
                 </button>
                 
-               {/* Show Schedule Button OR DateTime Input */}
-                  {/* {activeStartupId === startup._id ? (
-                    <>
-                      <label className="block text-sm text-gray-600 mt-4">Choose Date & Time:</label>
-                      <input
-                        type="datetime-local"
-                        className="mt-1 w-full p-2 border rounded"
-                        onChange={(e) =>
-                          setSelectedDateTime((prev) => ({
-                            ...prev,
-                            [startup._id]: e.target.value,
-                          }))
-                        }
-                      />
-                     
-                       <button
-                        onClick={async () => {
-                          const data = await fetchName(email);
-                          const client_data= await fetchClientData(startup.client_mail);
-                          console.log("client name",client_data.fullName)
-                          console.log('Full Name:', data.fullName);
-                          console.log('linkedin:', data.linkedIn);
-                          scheduleMeeting(startup._id, startup.startupName,client_data.fullName, startup.client_mail, data.fullName,data.linkedIn);
-                        }}
-                        disabled={loadingMeetings[startup._id]}
-                        className={`mt-2 w-full px-4 py-2 rounded-lg transition ${
-                          loadingMeetings[startup._id]
-                            ? "bg-gray-400 text-white cursor-wait"
-                            : "bg-green-600 text-white hover:bg-green-700"
-                        }`}
-                      >
-                        {loadingMeetings[startup._id] ? (
-                          <span className="flex items-center justify-center">
-                            <svg
-                              className="animate-spin h-5 w-5 mr-2 text-white"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              ></circle>
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8v8H4z"
-                              ></path>
-                            </svg>
-                            Scheduling...
-                          </span>
-                        ) : (
-                          "Confirm Meeting"
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => setActiveStartupId(null)}
-                        className="mt-2 w-full px-4 py-2 text-sm bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                   
-                    <button
-                      onClick={() => setActiveStartupId(startup._id)}
-                      disabled={!session}
-                      className={`mt-4 w-full px-4 py-2 rounded-lg transition ${
-                        session
-                          ? "bg-green-600 text-white hover:bg-green-700"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      }`}
-                    >
-                      Schedule Meeting
-                    </button>
-                  )} */}
+             
 
                   {scheduledStartups.has(startup._id) ? (
-  <button
-    className="mt-4 w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-    onClick={() => alert('Redirect to feedback form or handle feedback logic')}
-  >
-    Give Feedback
-  </button>
-) : activeStartupId === startup._id ? (
-  <>
-    <label className="block text-sm text-gray-600 mt-4">Choose Date & Time:</label>
-    <input
-      type="datetime-local"
-      className="mt-1 w-full p-2 border rounded"
-      onChange={(e) =>
-        setSelectedDateTime((prev) => ({
-          ...prev,
-          [startup._id]: e.target.value,
-        }))
-      }
-    />
-    
-    <button
-      onClick={async () => {
-        const data = await fetchName(email);
-        const client_data = await fetchClientData(startup.client_mail);
-        console.log("client name", client_data.fullName);
-        console.log("Full Name:", data.fullName);
-        console.log("linkedin:", data.linkedIn);
-        scheduleMeeting(
-          startup._id,
-          startup.startupName,
-          client_data.fullName,
-          startup.client_mail,
-          data.fullName,
-          data.linkedIn
-        );
-      }}
-      disabled={loadingMeetings[startup._id]}
-      className={`mt-2 w-full px-4 py-2 rounded-lg transition ${
-        loadingMeetings[startup._id]
-          ? "bg-gray-400 text-white cursor-wait"
-          : "bg-green-600 text-white hover:bg-green-700"
-      }`}
-    >
-      {loadingMeetings[startup._id] ? (
-        <span className="flex items-center justify-center">
-          <svg
-            className="animate-spin h-5 w-5 mr-2 text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v8H4z"
-            ></path>
-          </svg>
-          Scheduling...
-        </span>
-      ) : (
-        "Confirm Meeting"
-      )}
-    </button>
+                      <button
+                        className="mt-4 w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                        onClick={() => alert('Redirect to feedback form or handle feedback logic')}
+                      >
+                        Give Feedback
+                      </button>
+                    ) : activeStartupId === startup._id ? (
+                      <>
+                        <label className="block text-sm text-gray-600 mt-4">Choose Date & Time:</label>
+                        <input
+                          type="datetime-local"
+                          className="mt-1 w-full p-2 border rounded"
+                          onChange={(e) =>
+                            setSelectedDateTime((prev) => ({
+                              ...prev,
+                              [startup._id]: e.target.value,
+                            }))
+                          }
+                        />
+                        
+                        <button
+                          onClick={async () => {
+                            const data = await fetchName(email);
+                            const client_data = await fetchClientData(startup.client_mail);
+                            console.log("client name", client_data.fullName);
+                            console.log("Full Name:", data.fullName);
+                            console.log("linkedin:", data.linkedIn);
+                            scheduleMeeting(
+                              startup._id,
+                              startup.startupName,
+                              client_data.fullName,
+                              startup.client_mail,
+                              data.fullName,
+                              data.linkedIn
+                            );
+                          }}
+                          disabled={loadingMeetings[startup._id]}
+                          className={`mt-2 w-full px-4 py-2 rounded-lg transition ${
+                            loadingMeetings[startup._id]
+                              ? "bg-gray-400 text-white cursor-wait"
+                              : "bg-green-600 text-white hover:bg-green-700"
+                          }`}
+                        >
+                          {loadingMeetings[startup._id] ? (
+                            <span className="flex items-center justify-center">
+                              <svg
+                                className="animate-spin h-5 w-5 mr-2 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                ></circle>
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8v8H4z"
+                                ></path>
+                              </svg>
+                              Scheduling...
+                            </span>
+                          ) : (
+                            "Confirm Meeting"
+                          )}
+                        </button>
 
-    <button
-      onClick={() => setActiveStartupId(null)}
-      className="mt-2 w-full px-4 py-2 text-sm bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
-    >
-      Cancel
-    </button>
-  </>
-) : (
-  <button
-    onClick={() => setActiveStartupId(startup._id)}
-    disabled={!session}
-    className={`mt-4 w-full px-4 py-2 rounded-lg transition ${
-      session
-        ? "bg-green-600 text-white hover:bg-green-700"
-        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-    }`}
-  >
-    Schedule Meeting
-  </button>
-)}
+                        <button
+                          onClick={() => setActiveStartupId(null)}
+                          className="mt-2 w-full px-4 py-2 text-sm bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => setActiveStartupId(startup._id)}
+                        disabled={!session}
+                        className={`mt-4 w-full px-4 py-2 rounded-lg transition ${
+                          session
+                            ? "bg-green-600 text-white hover:bg-green-700"
+                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        }`}
+                      >
+                        Schedule Meeting
+                      </button>
+                    )}
 
               
 
