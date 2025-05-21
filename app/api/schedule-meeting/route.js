@@ -1,15 +1,15 @@
 
-
 import { connectToDB } from '@/lib/mongodb';
 import Meeting from '@/models/Client_Meeting';
 import { google } from "googleapis";
+import nodemailer from 'nodemailer';
 
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { accessToken, startDateTime, startupName, client_name,client_mail, investor_name, linkedIn,investor_email } = body;
+    const { accessToken, startDateTime, startupName, client_mail, investor_name, investor_email } = body;
     console.log(body);
-    if (!accessToken || !startDateTime || !startupName  || !client_name|| !client_mail || !investor_name || !investor_email  || !linkedIn) {
+    if (!accessToken || !startDateTime || !startupName  || !client_mail || !investor_name || !investor_email ) {
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         { status: 400 }
@@ -34,7 +34,7 @@ export async function POST(request) {
           requestId: `req-${Date.now()}`,
           conferenceSolutionKey: { type: "hangoutsMeet" },
         },
-      }, 
+      },
     };
 
     const response = await calendar.events.insert({
@@ -51,15 +51,43 @@ export async function POST(request) {
       startupName,
       meetingLink,
       startDateTime,
-      client_name,
       client_mail,
       investor_email,
-      investor_name,
-      linkedIn
+      investor_name
     });
 
     await newMeeting.save();
+ const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USERNAME, // your Gmail address
+        pass: process.env.EMAIL_PASSWORD, // or use App Password if 2FA is enabled
+      },
+    });
+    const mailOptions = {
+      from: process.env.EMAIL_USERNAME,
+      to: `${client_mail}`,
+      subject: `Meeting Scheduled for ${startupName} by ${investor_name}`,
+      html: `
+        <p>Dear Innovator,</p>
 
+<p>We are pleased to inform you that your meeting has been successfully scheduled. Below are the details:</p>
+
+<ul>
+  <li><strong>Startup:</strong> ${startupName}</li>
+  <li><strong>Investor:</strong> ${investor_name}</li>
+  <li><strong>Date & Time:</strong> ${start.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</li>
+  <li><strong>Meeting Link:</strong> <a href="${meetingLink}">${meetingLink}</a></li>
+</ul>
+
+<p>We wish you a productive and insightful discussion.</p>
+
+<p>Warm regards,<br/>The Innovest Team</p>
+
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
     return new Response(JSON.stringify({ meetingLink }), { status: 200 });
 
   } catch (error) {
