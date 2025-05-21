@@ -153,6 +153,7 @@ const Dashboard = () => {
         body: JSON.stringify({
           accessToken,
           startDateTime: startTime,
+          startupId,
           startupName,
           client_name,
           client_mail,
@@ -276,6 +277,30 @@ const Dashboard = () => {
     </div>
   );
 
+  const [scheduledStartups, setScheduledStartups] = useState(new Set());
+  useEffect(() => {
+  if (!email) return;
+
+  const fetchScheduledMeetings = async () => {
+    try {
+      const res = await fetch('/api/get-investor-meetings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ investor_email: email }),
+        });
+      const data = await res.json();
+      const scheduledSet = new Set(data.map(meeting => meeting.startupId));
+      setScheduledStartups(scheduledSet);
+    } catch (error) {
+      console.error("Error fetching scheduled meetings:", error);
+    }
+  };
+
+  fetchScheduledMeetings();
+}, [email]);
+
+console.log(scheduledStartups)
+
   return (
     <div className="min-h-screen flex bg-gray-100">
       <aside className="w-64 bg-white border-r shadow-md hidden md:block">
@@ -286,15 +311,20 @@ const Dashboard = () => {
 
       <main className="flex-1 p-6 overflow-y-auto">
     
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">Recommended Startups</h1>
-          {!session ? (
-            <button
-              onClick={() => signIn("google")}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-            >
-              Login with Google
-            </button>
+       <div className="flex justify-between items-center mb-6">
+             <h1 className="text-3xl font-bold text-gray-800">Recommended Startups</h1>
+             {!session ? (
+               <div className="flex flex-col items-start sm:items-end">
+      <p className="text-m text-gray-800 mb-1">
+        <strong>Note:</strong> To schedule meetings, please login with Google Mail.
+      </p>
+      <button
+        onClick={() => signIn("google")}
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+      >
+        Login with Google
+      </button>
+      </div>
           ) : (
             <div className="flex items-center space-x-4">
               <p className="text-gray-600">Welcome, {session.user.name}!</p>
@@ -329,7 +359,7 @@ const Dashboard = () => {
                 </button>
                 
                {/* Show Schedule Button OR DateTime Input */}
-                  {activeStartupId === startup._id ? (
+                  {/* {activeStartupId === startup._id ? (
                     <>
                       <label className="block text-sm text-gray-600 mt-4">Choose Date & Time:</label>
                       <input
@@ -343,8 +373,6 @@ const Dashboard = () => {
                         }
                       />
                      
-                    
-
                        <button
                         onClick={async () => {
                           const data = await fetchName(email);
@@ -410,7 +438,102 @@ const Dashboard = () => {
                     >
                       Schedule Meeting
                     </button>
-                  )}
+                  )} */}
+
+                  {scheduledStartups.has(startup._id) ? (
+  <button
+    className="mt-4 w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+    onClick={() => alert('Redirect to feedback form or handle feedback logic')}
+  >
+    Give Feedback
+  </button>
+) : activeStartupId === startup._id ? (
+  <>
+    <label className="block text-sm text-gray-600 mt-4">Choose Date & Time:</label>
+    <input
+      type="datetime-local"
+      className="mt-1 w-full p-2 border rounded"
+      onChange={(e) =>
+        setSelectedDateTime((prev) => ({
+          ...prev,
+          [startup._id]: e.target.value,
+        }))
+      }
+    />
+    
+    <button
+      onClick={async () => {
+        const data = await fetchName(email);
+        const client_data = await fetchClientData(startup.client_mail);
+        console.log("client name", client_data.fullName);
+        console.log("Full Name:", data.fullName);
+        console.log("linkedin:", data.linkedIn);
+        scheduleMeeting(
+          startup._id,
+          startup.startupName,
+          client_data.fullName,
+          startup.client_mail,
+          data.fullName,
+          data.linkedIn
+        );
+      }}
+      disabled={loadingMeetings[startup._id]}
+      className={`mt-2 w-full px-4 py-2 rounded-lg transition ${
+        loadingMeetings[startup._id]
+          ? "bg-gray-400 text-white cursor-wait"
+          : "bg-green-600 text-white hover:bg-green-700"
+      }`}
+    >
+      {loadingMeetings[startup._id] ? (
+        <span className="flex items-center justify-center">
+          <svg
+            className="animate-spin h-5 w-5 mr-2 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v8H4z"
+            ></path>
+          </svg>
+          Scheduling...
+        </span>
+      ) : (
+        "Confirm Meeting"
+      )}
+    </button>
+
+    <button
+      onClick={() => setActiveStartupId(null)}
+      className="mt-2 w-full px-4 py-2 text-sm bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+    >
+      Cancel
+    </button>
+  </>
+) : (
+  <button
+    onClick={() => setActiveStartupId(startup._id)}
+    disabled={!session}
+    className={`mt-4 w-full px-4 py-2 rounded-lg transition ${
+      session
+        ? "bg-green-600 text-white hover:bg-green-700"
+        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+    }`}
+  >
+    Schedule Meeting
+  </button>
+)}
+
               
 
                 <a

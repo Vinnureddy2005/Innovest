@@ -1,12 +1,40 @@
 "use client";
+import React, { useState } from "react";
 
-export default function contact() {
+export default function Contact() {
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [status, setStatus] = useState("");
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("Sending...");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (res.ok) {
+        setStatus("Message sent successfully!");
+        setForm({ name: "", email: "", message: "" });
+      } else {
+        const errorData = await res.json();
+        setStatus(errorData.error || "Failed to send message.");
+      }
+    } catch (err) {
+      setStatus("Something went wrong.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#fffaf0] via-[#f1f1f1] to-[#fefefa text-gray-800 font-sans">
-      <section
-        id="contact"
-        className="px-10 py-20 "
-      >
+      <section id="contact" className="px-10 py-20">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-m font-bold text-gray-700 tracking-widest uppercase mb-2">
             Get In Touch
@@ -15,27 +43,39 @@ export default function contact() {
             Contact Innovest Team
           </h1>
           <p className="text-gray-700 mb-12">
-            {"Have a question, suggestion, or want to collaborate? We'd love to hear from you!"}
+            Have a question, suggestion, or want to collaborate? We'd love to
+            hear from you!
           </p>
 
-
-          <form className="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-lg grid gap-6">
+          <form
+            onSubmit={handleSubmit}
+            className="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-lg grid gap-6"
+          >
             <input
               type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
               placeholder="Your Name"
-              className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a56d54]"
               required
+              className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a56d54]"
             />
             <input
               type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
               placeholder="Your Email"
-              className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a56d54]"
               required
+              className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a56d54]"
             />
             <textarea
+              name="message"
+              value={form.message}
+              onChange={handleChange}
               placeholder="Your Message"
-              className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a56d54]"
               required
+              className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a56d54]"
             ></textarea>
             <button
               type="submit"
@@ -43,19 +83,28 @@ export default function contact() {
             >
               Send Message
             </button>
+            {status && <p className="text-gray-600 mt-2">{status}</p>}
           </form>
 
           <div className="mt-12 text-gray-600">
-            <p>Email us at: <span className="text-blue-600 font-medium">support@innovest.com</span></p>
-            <p>Phone: <span className="text-blue-600 font-medium">+91 9100721889 , +91 6300159445</span></p>
+            <p>
+              Email us at:{" "}
+              <span className="text-blue-600 font-medium">
+                innovest.team@gmail.com
+              </span>
+            </p>
+            <p>
+              Phone:{" "}
+              <span className="text-blue-600 font-medium">
+                +91 9100721889 , +91 6300159445
+              </span>
+            </p>
           </div>
-          <div className="mt-5 mb-[-20] text-center text-gray-500 font-semibold text-sm">
-  © {new Date().getFullYear()} Innovest. All rights reserved.
-</div>
-
+          <div className="mt-5 text-center text-gray-500 font-semibold text-sm">
+            © {new Date().getFullYear()} Innovest. All rights reserved.
+          </div>
         </div>
       </section>
-      
     </div>
   );
 }

@@ -19,7 +19,31 @@ const [selectedStages, setSelectedStages] = useState([]);
 const [selectedFunding, setSelectedFunding] = useState([]);
 const [showLiked, setShowLiked] = useState(false);
 const [showInvested, setShowInvested] = useState(false);
+const [fileUrl, setFileUrl] = useState(null);
+const [isPopupOpen, setIsPopupOpen] = useState(false);
 
+
+ const [scheduledStartups, setScheduledStartups] = useState(new Set());
+  useEffect(() => {
+  if (!email) return;
+
+  const fetchScheduledMeetings = async () => {
+    try {
+      const res = await fetch('/api/get-investor-meetings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ investor_email: email }),
+        });
+      const data = await res.json();
+      const scheduledSet = new Set(data.map(meeting => meeting.startupId));
+      setScheduledStartups(scheduledSet);
+    } catch (error) {
+      console.error("Error fetching scheduled meetings:", error);
+    }
+  };
+
+  fetchScheduledMeetings();
+}, [email]);
 
   useEffect(() => {
     if (!email) return;
@@ -210,7 +234,56 @@ const handleInvested = async (startup) => {
   }
 };
   if (loading) return <p>Loading...</p>;
+const handleView = async (id) => {
+   
+  setLoading(true);
 
+  try {
+    const response = await fetch(`/api/propose/${id}`);
+    if (response.status === 404) {
+      alert("No File Found");
+      setLoading(false);
+      return;
+    }
+    if (!response.ok) {
+      throw new Error('Failed to fetch the file');
+    }
+    
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    
+    // Set the file URL and open the popup
+    setFileUrl(url);
+    setIsPopupOpen(true);
+
+    setLoading(false);
+  } catch (error) {
+    console.error(error);
+    setLoading(false);
+  }
+};
+const PopupModal = ({ fileUrl, onClose }) => (
+  <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-30">
+    <div className="rounded-lg border border-gray-300" style={{ width: '1000px', height: '842px' }}>
+      <button 
+        onClick={onClose} 
+        className="absolute top-2  rounded-lg right-2 text-white"
+      >
+        close
+      </button>
+      <iframe 
+        src={fileUrl} 
+        className="w-full h-full" 
+        title="File Preview"
+      />
+    </div>
+  </div>
+);
+
+
+
+console.log(scheduledStartups)
   return (
    <div className="min-h-screen flex bg-gray-100">
          {/* Sidebar */}
@@ -223,15 +296,20 @@ const handleInvested = async (startup) => {
          {/* Main Content */}
          <main className="flex-1 p-6 overflow-y-auto">
            {/* Header */}
-           <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-6">
              <h1 className="text-3xl font-bold text-gray-800">Recommended Startups</h1>
              {!session ? (
-               <button
-                 onClick={() => signIn("google")}
-                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-               >
-                 Login with Google
-               </button>
+               <div className="flex flex-col items-start sm:items-end">
+      <p className="text-m text-gray-800 mb-1">
+        <strong>Note:</strong> To schedule meetings, please login with Google Mail.
+      </p>
+      <button
+        onClick={() => signIn("google")}
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+      >
+        Login with Google
+      </button>
+      </div>
              ) : (
                <div className="flex items-center space-x-4">
                  <p className="text-gray-600">Welcome, {session.user.name}!</p>
@@ -393,89 +471,107 @@ const normalizedFunding = selectedFunding.map(f => f.toLowerCase());
                    <p className="mt-2 text-gray-600">📌 Industry: <span className="font-medium">{startup.industry}</span></p>
                    <p className="text-gray-600">🚀 Stage: <span className="font-medium">{startup.stage}</span></p>
                    <p className="text-gray-600">💰 Funding: <span className="font-medium">{startup.funding}</span></p>
-   
+    <button 
+                  onClick={() => handleView(startup._id)}
+                  className="px-1 py-1 bg-blue-600 text-white rounded-sm shadow hover:bg-blue-700 transition duration-200"
+                >
+                  View
+                </button>
                    
                   {/* Show Schedule Button OR DateTime Input */}
-                     {activeStartupId === startup._id ? (
-                       <>
-                         <label className="block text-sm text-gray-600 mt-4">Choose Date & Time:</label>
-                         <input
-                           type="datetime-local"
-                           className="mt-1 w-full p-2 border rounded"
-                           onChange={(e) =>
-                             setSelectedDateTime((prev) => ({
-                               ...prev,
-                               [startup._id]: e.target.value,
-                             }))
-                           }
-                         />
-                        
-                       
-   
+                      {scheduledStartups.has(startup._id) ? (
                           <button
-                           onClick={async () => {
-                             const fullName = await fetchName(email);
-                             console.log('Full Name:', fullName);
-                             scheduleMeeting(startup._id, startup.startupName, startup.client_mail, fullName);
-                           }}
-                           disabled={loadingMeetings[startup._id]}
-                           className={`mt-2 w-full px-4 py-2 rounded-lg transition ${
-                             loadingMeetings[startup._id]
-                               ? "bg-gray-400 text-white cursor-wait"
-                               : "bg-green-600 text-white hover:bg-green-700"
-                           }`}
-                         >
-                           {loadingMeetings[startup._id] ? (
-                             <span className="flex items-center justify-center">
-                               <svg
-                                 className="animate-spin h-5 w-5 mr-2 text-white"
-                                 xmlns="http://www.w3.org/2000/svg"
-                                 fill="none"
-                                 viewBox="0 0 24 24"
-                               >
-                                 <circle
-                                   className="opacity-25"
-                                   cx="12"
-                                   cy="12"
-                                   r="10"
-                                   stroke="currentColor"
-                                   strokeWidth="4"
-                                 ></circle>
-                                 <path
-                                   className="opacity-75"
-                                   fill="currentColor"
-                                   d="M4 12a8 8 0 018-8v8H4z"
-                                 ></path>
-                               </svg>
-                               Scheduling...
-                             </span>
-                           ) : (
-                             "Confirm Meeting"
-                           )}
-                         </button>
-   
-                         <button
-                           onClick={() => setActiveStartupId(null)}
-                           className="mt-2 w-full px-4 py-2 text-sm bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
-                         >
-                           Cancel
-                         </button>
-                       </>
-                     ) : (
-                      
-                       <button
-                         onClick={() => setActiveStartupId(startup._id)}
-                         disabled={!session}
-                         className={`mt-4 w-full px-4 py-2 rounded-lg transition ${
-                           session
-                             ? "bg-green-600 text-white hover:bg-green-700"
-                             : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                         }`}
-                       >
-                         Schedule Meeting
-                       </button>
-                     )}
-   
+                            className="mt-4 w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                            onClick={() => alert('Redirect to feedback form or handle feedback logic')}
+                          >
+                            Give Feedback
+                          </button>
+                        ) : activeStartupId === startup._id ? (
+                          <>
+                            <label className="block text-sm text-gray-600 mt-4">Choose Date & Time:</label>
+                            <input
+                              type="datetime-local"
+                              className="mt-1 w-full p-2 border rounded"
+                              onChange={(e) =>
+                                setSelectedDateTime((prev) => ({
+                                  ...prev,
+                                  [startup._id]: e.target.value,
+                                }))
+                              }
+                            />
+                            
+                            <button
+                              onClick={async () => {
+                                const data = await fetchName(email);
+                                const client_data = await fetchClientData(startup.client_mail);
+                                console.log("client name", client_data.fullName);
+                                console.log("Full Name:", data.fullName);
+                                console.log("linkedin:", data.linkedIn);
+                                scheduleMeeting(
+                                  startup._id,
+                                  startup.startupName,
+                                  client_data.fullName,
+                                  startup.client_mail,
+                                  data.fullName,
+                                  data.linkedIn
+                                );
+                              }}
+                              disabled={loadingMeetings[startup._id]}
+                              className={`mt-2 w-full px-4 py-2 rounded-lg transition ${
+                                loadingMeetings[startup._id]
+                                  ? "bg-gray-400 text-white cursor-wait"
+                                  : "bg-green-600 text-white hover:bg-green-700"
+                              }`}
+                            >
+                              {loadingMeetings[startup._id] ? (
+                                <span className="flex items-center justify-center">
+                                  <svg
+                                    className="animate-spin h-5 w-5 mr-2 text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <circle
+                                      className="opacity-25"
+                                      cx="12"
+                                      cy="12"
+                                      r="10"
+                                      stroke="currentColor"
+                                      strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                      className="opacity-75"
+                                      fill="currentColor"
+                                      d="M4 12a8 8 0 018-8v8H4z"
+                                    ></path>
+                                  </svg>
+                                  Scheduling...
+                                </span>
+                              ) : (
+                                "Confirm Meeting"
+                              )}
+                            </button>
+
+                            <button
+                              onClick={() => setActiveStartupId(null)}
+                              className="mt-2 w-full px-4 py-2 text-sm bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => setActiveStartupId(startup._id)}
+                            disabled={!session}
+                            className={`mt-4 w-full px-4 py-2 rounded-lg transition ${
+                              session
+                                ? "bg-green-600 text-white hover:bg-green-700"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            }`}
+                          >
+                            Schedule Meeting
+                          </button>
+                        )}
                  
    
                    <a
@@ -527,7 +623,12 @@ const normalizedFunding = selectedFunding.map(f => f.toLowerCase());
 >
   Clear Filters
 </button>
-
+{isPopupOpen && (
+                          <PopupModal 
+                            fileUrl={fileUrl} 
+                            onClose={() => setIsPopupOpen(false)} 
+                          />
+                        )}
          </main>
                        </div>
   );

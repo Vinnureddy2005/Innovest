@@ -1,7 +1,10 @@
 import mongoose from 'mongoose';
 
 const Invsetor_meetingSchema = new mongoose.Schema({
- 
+ startupId: {
+    type: String,
+    required: true,
+  },
   startupName: {
     type: String,
     required: true,

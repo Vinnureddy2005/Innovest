@@ -35,6 +35,8 @@ export default function InvestorMeetingsPage() {
     fetchMeetings();
   }, [investorEmail]);
 
+  
+
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     router.push('/');
