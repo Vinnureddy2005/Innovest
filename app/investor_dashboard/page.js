@@ -1,295 +1,4 @@
-// "use client"
-// import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
-// import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
-// import { signIn, signOut, useSession } from "next-auth/react";
-// import { useSearchParams } from 'next/navigation';
-// import { useEffect, useState } from 'react';
-// import DashboardPage from "../investor_sidebar/page";
 
-// const Dashboard = () => {
-//   const [recommendedStartups, setRecommendedStartups] = useState([]);
-//   const [cfRecommendedStartups, setCFRecommendedStartups] = useState([]);
-//   const [meetingLinks, setMeetingLinks] = useState({});
-//   const searchParams = useSearchParams();
-//   const email = searchParams.get('email');
-//   const [likedStartups, setLikedStartups] = useState(new Set());
-//   const [investedStartups, setInvestedStartups] = useState(new Set());
-
-// useEffect(() => {
-//     if (!email) return;
-//     sessionStorage.setItem('email', email);
-
-//     const fetchRecommendedStartups = async () => {
-//       try {
-//         const response = await fetch(`/api/recommendations?email=${email}`);
-//         const data = await response.json();
-//         setRecommendedStartups(data);
-//       } catch (error) {
-//         console.error("Error fetching recommendations:", error);
-//       }
-//     };
-
-//     fetchRecommendedStartups();
-//   }, [email]);
- 
-// useEffect(() => {
-//   if (!email) return;
-//  sessionStorage.setItem('email', email);
-//   const fetchCFRecommendedStartups = async () => {
-//     try {
-//       const response = await fetch(`/api/cf/?email=${email}`);
-//       const data = await response.json();
-//       console.log('Collaborative Filtering Startups:', data); // Log data to check
-// setCFRecommendedStartups(data.recommendations || []);    } catch (error) {
-//       console.error("Error fetching collaborative filtering recommendations:", error);
-//     }
-//   };
-
-//   fetchCFRecommendedStartups();
-// }, [email]); // Only rerun this effect when `email` changes
-
-// // This useEffect will run when `cfRecommendedStartups` changes
-// useEffect(() => {
-//   console.log("Updated cfRecommendedStartups:", cfRecommendedStartups);
-// }, [cfRecommendedStartups]); // This will log the updated state whenever it changes
-
-
-
-//   useEffect(() => {
-//     if (!email) return;
-  
-//     const fetchInvestorResponses = async () => {
-//       try {
-//         const res = await fetch(`/api/investorResponse?email=${email}`);
-//         const data = await res.json();
-  
-//         const likedSet = new Set();
-//         const investedSet = new Set();
-  
-//         data.forEach((item) => {
-//           if (item.liked) likedSet.add(item.startupId); // FIX: use startupId
-//           if (item.invested) investedSet.add(item.startupId); // FIX: use startupId
-//         });
-  
-//         setLikedStartups(likedSet);
-//         setInvestedStartups(investedSet);
-//       } catch (error) {
-//         console.error("Error fetching investor responses:", error);
-//       }
-//     };
-  
-//     fetchInvestorResponses();
-//   }, [email]);
- 
-
-  
-//   const fetchName = async (email) => {
-//   try {
-//     const response = await fetch('/api/inv_name', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify({ email }),
-//     });
-
-//     const data = await response.json();
-
-//     if (!response.ok) throw new Error(data.message);
-//     return data.fullName;
-//   } catch (err) {
-//     console.error('Error fetching name:', err.message);
-//     return null;
-//   }
-// };
-
-
-// const { data: session } = useSession();
-
-
-// const [activeStartupId, setActiveStartupId] = useState(null);
-// const [selectedDateTime, setSelectedDateTime] = useState({});
- 
-
-// const [loadingMeetings, setLoadingMeetings] = useState({});
-
-
-// const scheduleMeeting = async (startupId, startupName, client_mail, fullName) => {
-//   const startTime = selectedDateTime[startupId];
-//   if (!startTime) {
-//     alert("Please select a date and time first.");
-//     return;
-//   }
-
-//   if (!session) {
-//     alert("Please log in to schedule a meeting!");
-//     return;
-//   }
-
-//   const accessToken = session?.accessToken;
-//   if (!accessToken) {
-//     alert("No access token found. Please log in again.");
-//     signOut();
-//     return;
-//   }
-
-//   // Start animation
-//   setLoadingMeetings((prev) => ({ ...prev, [startupId]: true }));
-
-//   // Wait at least 2 seconds
-//   await new Promise((resolve) => setTimeout(resolve, 2000));
-
-//   try {
-//     const res = await fetch("/api/schedule-meeting", {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({
-//         accessToken,
-//         startDateTime: startTime,
-//         startupName,
-//         client_mail,
-//         investor_name: fullName,
-//         investor_email: email,
-//       }),
-//     });
-
-//     const data = await res.json();
-
-//     if (data.meetingLink) {
-//       setMeetingLinks((prev) => ({
-//         ...prev,
-//         [startupId]: data.meetingLink,
-//       }));
-//       alert("Meeting Scheduled Successfully!!");
-//       setActiveStartupId(null);
-//     } else {
-//       alert("Failed to schedule meeting.");
-//     }
-//   } catch (err) {
-//     console.error("Error:", err);
-//     alert("An error occurred while scheduling the meeting.");
-//   } finally {
-//     setLoadingMeetings((prev) => ({ ...prev, [startupId]: false }));
-//   }
-// };
-// const handleLike = async (startup) => {
-//   const investorEmail = sessionStorage.getItem('email');
-//   const liked = !likedStartups.has(startup._id); 
-
-//   try {
-//     await fetch('/api/investorResponse', {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({
-//         email: investorEmail,
-//         startupId: startup._id,
-//         startupName: startup.startupName,
-//         liked,
-//       }),
-//     });
-
-//     setLikedStartups((prev) => {
-//       const newSet = new Set(prev);
-//       liked ? newSet.add(startup._id) : newSet.delete(startup._id);
-//       return newSet;
-//     });
-//   } catch (error) {
-//     console.error("Error updating like:", error);
-//   }
-// };
-
-// const handleInvested = async (startup) => {
-//   const investorEmail = sessionStorage.getItem('email');
-//   const invested = !investedStartups.has(startup.startupName); // toggle
-//   const alreadyInvested = investedStartups.has(startup._id);
-//   if (!alreadyInvested) {
-//     const confirmed = window.confirm(
-//       "⚠️ Choose this only if you have actually invested.\n\n" +
-//       "This will affect your future recommendations and you won't be recommended this startup again.\n\n" +
-//       "This action is **undoable**, are you sure you want to proceed?"
-//     );
-//     if (!confirmed) return;
-//   }
-//   try {
-//     await fetch('/api/investorResponse', {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({
-//         email: investorEmail,
-//         startupId: startup._id,
-//         startupName: startup.startupName,
-//         invested,
-//       }),
-//     });
-
-//     setInvestedStartups((prev) => {
-//       const newSet = new Set(prev);
-//       invested ? newSet.add(startup._id) : newSet.delete(startup._id);
-//       return newSet;
-//     });
-//   } catch (error) {
-//     console.error("Error updating invested:", error);
-//   }
-// };
-// const allRecommendedStartups = [...recommendedStartups, ...cfRecommendedStartups];
-
-// // Remove duplicates by _id
-// const uniqueStartups = Array.from(
-//   new Map(allRecommendedStartups.map(startup => [startup._id, startup])).values()
-// );
-// const [loading, setLoading] = useState(false);
-// const [proposals, setProposals] = useState([]);
-
-// const [fileUrl, setFileUrl] = useState(null);
-// const [isPopupOpen, setIsPopupOpen] = useState(false);
-
- 
-//   const handleView = async (id) => {
-   
-//   setLoading(true);
-
-//   try {
-//     const response = await fetch(`/api/propose/${id}`);
-//     if (response.status === 404) {
-//       alert("No File Found");
-//       setLoading(false);
-//       return;
-//     }
-//     if (!response.ok) {
-//       throw new Error('Failed to fetch the file');
-//     }
-    
-
-//     const blob = await response.blob();
-//     const url = window.URL.createObjectURL(blob);
-    
-//     // Set the file URL and open the popup
-//     setFileUrl(url);
-//     setIsPopupOpen(true);
-
-//     setLoading(false);
-//   } catch (error) {
-//     console.error(error);
-//     setLoading(false);
-//   }
-// };
-// const PopupModal = ({ fileUrl, onClose }) => (
-//   <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-30">
-//     <div className="rounded-lg border border-gray-300" style={{ width: '1000px', height: '842px' }}>
-//       <button 
-//         onClick={onClose} 
-//         className="absolute top-2  rounded-lg right-2 text-white"
-//       >
-//         close
-//       </button>
-//       <iframe 
-//         src={fileUrl} 
-//         className="w-full h-full" 
-//         title="File Preview"
-//       />
-//     </div>
-//   </div>
-// );
 "use client"
 import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
@@ -381,13 +90,32 @@ const Dashboard = () => {
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
-      return data.fullName;
+      return data;
     } catch (err) {
       console.error('Error fetching name:', err.message);
       return null;
     }
   };
 
+  const fetchClientData = async (email) => {
+      try {
+        const storedEmail = sessionStorage.getItem('email');
+        if (!storedEmail) return;
+
+        const res = await fetch(`/api/client_profile?email=${email}`);
+        if (!res.ok) return;
+
+        const data = await res.json();
+        
+        return data.client;
+      } catch (error) {
+        console.error('Error fetching client data:', error);
+      }
+    };
+
+
+
+  
   const { data: session } = useSession();
   const [activeStartupId, setActiveStartupId] = useState(null);
   const [selectedDateTime, setSelectedDateTime] = useState({});
@@ -426,7 +154,9 @@ const Dashboard = () => {
           accessToken,
           startDateTime: startTime,
           startupName,
+          client_name,
           client_mail,
+          linkedIn,
           investor_name: fullName,
           investor_email: email,
         }),

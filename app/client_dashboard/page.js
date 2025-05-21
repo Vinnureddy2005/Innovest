@@ -76,6 +76,7 @@ export default function DashboardPage() {
     localStorage.removeItem('authToken'); 
     router.push('/'); 
   };
+  
 
   return (
     <div className={`min-h-screen flex`}>
