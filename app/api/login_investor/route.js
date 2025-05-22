@@ -18,6 +18,11 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Incorrect password' }, { status: 401 });
     }
 
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+       
+         if (today > new Date(user.validUpto)) {return NextResponse.json({ error: 'Membership Expired' }, { status: 401 });}
+
     return NextResponse.json({ message: 'Login successful', user }, { status: 200 });
 
   } catch (err) {

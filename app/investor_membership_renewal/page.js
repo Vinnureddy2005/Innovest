@@ -1,16 +1,19 @@
-
-
-"use client";
+'use client';
 
 import { loadStripe } from "@stripe/stripe-js";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from "react";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
-export default function Payment() {
-  const router = useRouter();
+export default function InvestorRenewalPage() {
+  const searchParams = useSearchParams();
+
+  // Get email and plan from URL query params
+ 
+
+ const router = useRouter();
   const [amount, setAmount] = useState(0);
   const [qrSrc, setQrSrc] = useState("");
   const [transactionId, setTransactionId] = useState("");
@@ -18,27 +21,53 @@ export default function Payment() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+
+const [chosenPlan, setChosenPlan] = useState("");
+ const[investor_email,Setinvestor_email]=useState("");
+
   useEffect(() => {
-    const userDetails = JSON.parse(localStorage.getItem("signupData"));
-    if (!userDetails?.email) {
-      alert("No user data found!");
-      router.push("/");
-      return;
-    }
-    setUserData(userDetails);
-    console.log(userDetails)
-    const price = userDetails.membershipPlan === "pro" ? 999 : 599;
-    setAmount(price);
-
-    const searchParams = new URLSearchParams(window.location.search);
-    const success = searchParams.get("success");
-    const sessionId = searchParams.get("session_id");
-
-    if (success === "true" && sessionId) {
-      setTransactionId(sessionId);
-      handleSubmit(sessionId, userDetails);
-    }
+    Setinvestor_email(sessionStorage.getItem('renewalEmail') || '');
+    const userplan=sessionStorage.getItem('renewalPlan') || '';
+    setChosenPlan(userplan === "Annual" ? "pro" : "basic");
   }, []);
+
+useEffect(() => {
+  const fetchClientData = async () => {
+    try {
+      const res = await fetch(`/api/investor_profile?email=${investor_email}`);
+      if (!res.ok) {
+        console.error('Failed to fetch client data');
+        return;
+      }
+
+      const data = await res.json();
+      const investor = data.investor;
+      setUserData(investor);
+
+    } catch (error) {
+      console.error('Error fetching client data:', error);
+    }
+  };
+
+  fetchClientData();
+}, [investor_email]);
+
+  console.log(userData)
+
+  useEffect(() => {
+  const price = chosenPlan === "pro" ? 1999 : 1099;
+  setAmount(price);
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const success = searchParams.get("success");
+  const sessionId = searchParams.get("session_id");
+
+  if (success === "true" && sessionId && chosenPlan) {
+    setTransactionId(sessionId);
+    renewMembership({ investor_email, choosenplan: chosenPlan, id: sessionId });
+  }
+}, [chosenPlan]);
+
 
   const generateQR = async () => {
     if (!amount) return alert("Enter a valid amount");
@@ -51,79 +80,80 @@ export default function Payment() {
     }
   };
 
-  const handleSubmit = async (id = transactionId, data = userData) => {
-    if (!id) return alert("Enter transaction ID");
+ 
 
-    const finalData = { ...data, transactionId: id };
+  const renewMembership = async ({ investor_email, choosenplan, id=transactionId }) => {
+  try {
+    console.log("🚀 PUT /api/client_renew_membership handler triggered");
 
-    try {
-      const res = await fetch("/api/signup_client", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(finalData),
-      });
+    const res = await fetch('/api/investor_renew_membership', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email:investor_email, membershipPlan:choosenplan, transactionId:id }),
+    });
+    const data = await res.json();
+    console.log("Response came")
 
-      const result = await res.json();
-       if (!res.ok) {
-      // Check if error is about email
-      if (res.status === 409 && result.error === "Email already exists") {
-        alert("Email already exists");
-      } else {
-        alert("Error: " + (result.error || result.message || "Something went wrong"));
-      }
-    } else {
-      alert("Signup successful!");
-      router.push("/");
-    }
-    } catch (err) {
-      alert("Error: " + err.message);
-    }
-  };
+    if (!res.ok) throw new Error(data.error || 'Renewal failed');
+
+    alert(data.message);
+    router.push("/");
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
 
   const handleStripe = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    setLoading(true);
-    setError("");
+  setLoading(true);
+  setError("");
 
-    try {
-      const apiRoute =
-        userData.membershipPlan.toLowerCase() === "pro"
-          ? "/api/client_payment/pro"
-          : userData.membershipPlan.toLowerCase() === "basic"
-          ? "/api/client_payment/basic"
-          : null;
+  // Ensure this is available in scope
 
-      if (!apiRoute) {
-        throw new Error("Please select a valid membership plan.");
-      }
+  try {
+    const apiRoute =
+      chosenPlan === "pro"
+        ? "/api/investor_payment_renewal/pro"
+        : chosenPlan === "basic"
+        ? "/api/investor_payment_renewal/basic"
+        : null;
 
-      const res = await fetch(apiRoute, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to create Stripe session");
-      }
-
-      const { sessionId } = await res.json();
-
-      const stripe = await stripePromise;
-      const { error } = await stripe.redirectToCheckout({ sessionId });
-
-      if (error) {
-        setError(error.message);
-      }
-    } catch (err) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
+    if (!apiRoute) {
+      throw new Error("Please select a valid membership plan.");
     }
-  };
+
+    const res = await fetch(apiRoute, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: investor_email,
+        membershipPlan: chosenPlan,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to create Stripe session");
+    }
+
+    const { sessionId } = await res.json();
+
+    const stripe = await stripePromise;
+    const { error } = await stripe.redirectToCheckout({ sessionId });
+
+    if (error) {
+      setError(error.message);
+    }
+  } catch (err) {
+    setError(err.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-[#f1f5f9] flex items-center justify-center p-6">
@@ -200,13 +230,16 @@ export default function Payment() {
           </div>
 
           <button
-            onClick={() => handleSubmit()}
-            className="w-full py-3 rounded-xl bg-teal-600 text-white font-semibold hover:bg-teal-700 transition duration-300"
-          >
-            Submit Payment
-          </button>
+                onClick={() => renewMembership({ investor_email, choosenplan: chosenPlan, id: transactionId })}
+                className="w-full py-3 rounded-xl bg-teal-600 text-white font-semibold hover:bg-teal-700 transition duration-300"
+                >
+                Submit Payment
+                </button>
+
         </div>
       </div>
     </div>
   );
 }
+
+

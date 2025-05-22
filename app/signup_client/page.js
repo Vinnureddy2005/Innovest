@@ -26,6 +26,10 @@ const [error, setError] = useState('');
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+
+    
+  
+
   
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -35,27 +39,33 @@ const [error, setError] = useState('');
     return;
   }
 
-    const currentDate = new Date();
-    let validUptoDate = new Date(currentDate);
+  // Await the result of fetchClientData
+  const res = await fetch(`/api/client_profile?email=${formData.email}`);
+  if (res.ok) {
+    alert('Email already exists');
+    return;
+  }
 
-    if (formData.membershipPlan === 'basic') {
-      validUptoDate.setMonth(validUptoDate.getMonth() + 6);
-    } else if (formData.membershipPlan === 'pro') {
-      validUptoDate.setMonth(validUptoDate.getMonth() + 12);
-    } else {
-      throw new Error('Please select a valid membership plan.');
-    }
+  const currentDate = new Date();
+  let validUptoDate = new Date(currentDate);
 
-    const updatedFormData = {
-      ...formData,
-      validUpto: validUptoDate.toISOString().split('T')[0], // "YYYY-MM-DD"
-    };
+  if (formData.membershipPlan === 'basic') {
+    validUptoDate.setMonth(validUptoDate.getMonth() + 6);
+  } else if (formData.membershipPlan === 'pro') {
+    validUptoDate.setMonth(validUptoDate.getMonth() + 12);
+  } else {
+    throw new Error('Please select a valid membership plan.');
+  }
 
-   
-    localStorage.setItem('signupData', JSON.stringify(updatedFormData));
-    router.push('/payment-client');
- 
+  const updatedFormData = {
+    ...formData,
+    validUpto: validUptoDate.toISOString().split('T')[0],
+  };
+
+  localStorage.setItem('signupData', JSON.stringify(updatedFormData));
+  router.push('/payment-client');
 };
+
 
   
 
@@ -114,15 +124,15 @@ const [error, setError] = useState('');
 
               
               <button
-  type="submit"
-  disabled={loading}
-  className={`w-100 ml-10 border font-bold py-3 px-6 rounded-2xl shadow-lg transition-transform transform duration-300
-    ${loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-transparent border-gray-500 text-gray-700 hover:bg-gray-100 hover:scale-105'}`}
->
-  {loading ? 'Processing...' : 'Proceed to Payment'}
-</button>
+                  type="submit"
+                  disabled={loading}
+                  className={`w-100 ml-10 border font-bold py-3 px-6 rounded-2xl shadow-lg transition-transform transform duration-300
+                    ${loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-transparent border-gray-500 text-gray-700 hover:bg-gray-100 hover:scale-105'}`}
+                >
+                  {loading ? 'Processing...' : 'Proceed to Payment'}
+                </button>
 
-{error && <p className="text-red-600 mt-2">{error}</p>}
+                {error && <p className="text-red-600 mt-2">{error}</p>}
 
             </form>
           </motion.div>

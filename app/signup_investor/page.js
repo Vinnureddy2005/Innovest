@@ -48,65 +48,19 @@ export default function SignupTabs() {
     }
   };
 
-//  const handleSubmit = async (e) => {
-//   e.preventDefault();
 
-//   if (formData.password !== formData.confirmPassword) {
-//     alert('Passwords do not match.');
-//     return;
-//   }
 
-//   setLoading(true);
-//   setError('');
-
-//   try {
-//     localStorage.setItem('signupData', JSON.stringify(formData));
-
-//     // Select API endpoint based on membership plan
-//     const apiRoute =
-//       formData.membershipPlan === 'pro'
-//         ? '/api/investor_payment/pro'
-//         : formData.membershipPlan === 'basic'
-//         ? '/api/investor_payment/basic'
-//         : null;
-
-//     if (!apiRoute) {
-//       throw new Error('Please select a valid membership plan.');
-//     }
-
-//     const res = await fetch(apiRoute, {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify(formData),
-//     });
-
-//     if (!res.ok) {
-//       throw new Error('Failed to create Stripe session');
-//     }
-
-//     const { sessionId } = await res.json();
-
-//     const stripe = await stripePromise;
-//     const { error } = await stripe.redirectToCheckout({ sessionId });
-
-//     if (error) {
-//       setError(error.message);
-//     }
-//   } catch (err) {
-//     setError(err.message || 'Something went wrong');
-//   } finally {
-//     setLoading(false);
-//   }
-// };
-
- const handleSubmit = (e) => {
+ const handleSubmit = async(e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       alert('Passwords do not match.');
       return;
     }
+  const res = await fetch(`/api/investor_profile?email=${formData.email}`);
+  if (res.ok) {
+    alert('Email already exists');
+    return;
+  }
      const currentDate = new Date();
     let validUptoDate = new Date(currentDate);
 
