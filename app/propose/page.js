@@ -67,7 +67,9 @@ export default function ProposeIdeaPage() {
   const handleBack = () => setStep(prev => prev - 1);
   const handleSubmit = async () => {
     console.log('Submitting:', formData);
-  
+
+    
+    
     const form = new FormData();
     form.append('startupName', formData.startupName);
     form.append('website', formData.website);
@@ -76,8 +78,35 @@ export default function ProposeIdeaPage() {
     form.append('funding', formData.funding);
     form.append('client_mail', formData.client_mail);
     form.append('file', uploadedFile); 
+
+
   
     try {
+       const storedEmail = sessionStorage.getItem('email'); 
+          if (!storedEmail) {
+            console.error('No user email found.');
+            return;
+          }
+  
+        const client_res = await fetch(`/api/client_profile?email=${storedEmail}`);
+        if (!client_res.ok) {
+            console.error('Failed to fetch client data');
+            return;
+          }
+          
+          const client_data = await client_res.json();
+
+          console.log("client data",client_data)
+          const client = client_data.client;
+          const clientName= client.fullName;
+          const photo=client.photo || "";
+
+          form.append('clientname',clientName);
+          form.append('photo',photo);
+
+
+
+
       const res = await fetch('/api/propose', {
         method: 'POST',
         body: form,
@@ -96,6 +125,12 @@ export default function ProposeIdeaPage() {
       alert('An error occurred while submitting.');
     }
   };
+
+  
+      
+  
+      
+    
 
   
   const handleFileUpload = async (e) => {
@@ -187,6 +222,8 @@ export default function ProposeIdeaPage() {
       throw new Error("Validation error: " + error.message);
     }
   };
+
+
   
   
  

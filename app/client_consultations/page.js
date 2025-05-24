@@ -68,43 +68,43 @@ export default function ClientMeetingsPage() {
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {meetings.map((m, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition duration-300"
-              >
-                <h3 className="text-xl font-bold mb-2">{m.startupName}</h3>
-                <p className="text-sm text-gray-600 mb-1">
-                  <strong>Investor:</strong> {m.investor_name}
-                </p>
-                <p className="text-sm text-gray-600 mb-1">
-                  <strong>Email:</strong> {m.investor_email}
-                </p>
-                <p className="text-sm text-gray-600 mb-1">
-                  <strong>LinkedIn:</strong> {m.linkedIn}
-                </p>
-                <p className="text-sm text-gray-600 mb-1">
-                  <strong>Date:</strong>{' '}
-                  {new Date(m.startDateTime).toLocaleDateString()}
-                </p>
-                <p className="text-sm text-gray-600 mb-3">
-                  <strong>Time:</strong>{' '}
-                  {new Date(m.startDateTime).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </p>
-                <a
-                  href={m.meetingLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                >
-                  Join Meeting
-                </a>
-              </div>
-            ))}
-          </div>
+  {meetings.map((m, idx) => (
+    <div
+      key={idx}
+      className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition duration-300 p-4"
+    >
+      {/* Top Section: Photo + Startup Name */}
+      <div className="flex items-center gap-4 mb-4">
+        <img
+          src={m.invphoto || "/images/no-profile.png"}
+          alt={m.client_name}
+          className="w-14 h-14 rounded-full object-cover border border-gray-300"
+        />
+        <h3 className="text-lg font-semibold text-gray-800">{m.startupName}</h3>
+      </div>
+
+      {/* Info */}
+      <div className="text-sm text-gray-700 space-y-1 mb-4">
+        <p><span className="font-medium">Investor:</span> {m.client_name}</p>
+        <p><span className="font-medium">Email:</span> {m.client_mail}</p>
+        <p><span className="font-medium">LinkedIn:</span> <a href={m.linkedIn} className="text-blue-600 hover:underline" target="_blank">{m.linkedIn}</a></p>
+        <p><span className="font-medium">Date:</span> {new Date(m.startDateTime).toLocaleDateString()}</p>
+        <p><span className="font-medium">Time:</span> {new Date(m.startDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+      </div>
+
+      {/* CTA */}
+      <a
+        href={m.meetingLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block text-center mt-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+      >
+        Join Meeting
+      </a>
+    </div>
+  ))}
+</div>
+
         </div>
       </div>
     </div>

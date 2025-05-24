@@ -37,7 +37,8 @@ const Invsetor_meetingSchema = new mongoose.Schema({
     type: String, 
     required: true,
   },
-
+  clientphoto: { type: String },
+  invphoto: { type: String },
   createdAt: {
     type: Date,
     default: Date.now,

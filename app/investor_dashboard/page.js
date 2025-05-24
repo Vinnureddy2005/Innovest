@@ -97,21 +97,6 @@ const Dashboard = () => {
     }
   };
 
-  const fetchClientData = async (email) => {
-      try {
-        const storedEmail = sessionStorage.getItem('email');
-        if (!storedEmail) return;
-
-        const res = await fetch(`/api/client_profile?email=${email}`);
-        if (!res.ok) return;
-
-        const data = await res.json();
-        
-        return data.client;
-      } catch (error) {
-        console.error('Error fetching client data:', error);
-      }
-    };
 
 
 
@@ -124,7 +109,7 @@ const Dashboard = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [loading, setLoading] = useState(false); // ✅ Used here
 
-  const scheduleMeeting = async (startupId, startupName,client_name, client_mail, fullName, linkedIn) => {
+  const scheduleMeeting = async (startupId, startupName,client_name, client_mail,clientphoto, fullName, invphoto,linkedIn) => {
     const startTime = selectedDateTime[startupId];
     if (!startTime) {
       alert("Please select a date and time first.");
@@ -157,8 +142,10 @@ const Dashboard = () => {
           startupName,
           client_name,
           client_mail,
+          clientphoto,
           linkedIn,
           investor_name: fullName,
+          invphoto,
           investor_email: email,
         }),
       });
@@ -301,6 +288,9 @@ const Dashboard = () => {
 
 console.log(scheduledStartups)
 
+     
+
+
   return (
     <div className="min-h-screen flex bg-gray-100">
       <aside className="w-64 bg-white border-r shadow-md hidden md:block">
@@ -340,159 +330,181 @@ console.log(scheduledStartups)
  
 
         {/* Startups Grid */}
-        {uniqueStartups.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {uniqueStartups.map((startup) => (
-              <div
-                key={startup._id}
-                className="bg-white rounded-2xl shadow-md p-6 border hover:shadow-lg transition-all"
-              >
-                <h2 className="text-xl font-semibold text-blue-700">{startup.startupName}</h2>
-                <p className="mt-2 text-gray-600">📌 Industry: <span className="font-medium">{startup.industry}</span></p>
-                <p className="text-gray-600">🚀 Stage: <span className="font-medium">{startup.stage}</span></p>
-                <p className="text-gray-600">💰 Funding: <span className="font-medium">{startup.funding}</span></p>
-<button 
-                  onClick={() => handleView(startup._id)}
-                  className="px-1 py-1 bg-blue-600 text-white rounded-sm shadow hover:bg-blue-700 transition duration-200"
-                >
-                  View
-                </button>
-                
-             
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+  {uniqueStartups.map((startup) => (
+    <div
+  key={startup._id}
+  className="bg-white rounded-xl shadow-md p-4 w-full max-w-sm flex flex-col justify-between space-y-3"
+>
+  {/* Top Row: Logo + Text */}
+  <div className="flex items-center space-x-4">
+   <img
+    src={startup.photo || "/images/no-profile.png"}
+    alt={startup.startupName}
+    className="w-12 h-12 rounded-full object-cover"
+  />
 
-                  {scheduledStartups.has(startup._id) ? (
-                      <button
-                        className="mt-4 w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-                        onClick={() => alert('Redirect to feedback form or handle feedback logic')}
-                      >
-                        Give Feedback
-                      </button>
-                    ) : activeStartupId === startup._id ? (
-                      <>
-                        <label className="block text-sm text-gray-600 mt-4">Choose Date & Time:</label>
-                        <input
-                          type="datetime-local"
-                          className="mt-1 w-full p-2 border rounded"
-                          onChange={(e) =>
-                            setSelectedDateTime((prev) => ({
-                              ...prev,
-                              [startup._id]: e.target.value,
-                            }))
-                          }
-                        />
-                        
-                        <button
-                          onClick={async () => {
-                            const data = await fetchName(email);
-                            const client_data = await fetchClientData(startup.client_mail);
-                            console.log("client name", client_data.fullName);
-                            console.log("Full Name:", data.fullName);
-                            console.log("linkedin:", data.linkedIn);
-                            scheduleMeeting(
-                              startup._id,
-                              startup.startupName,
-                              client_data.fullName,
-                              startup.client_mail,
-                              data.fullName,
-                              data.linkedIn
-                            );
-                          }}
-                          disabled={loadingMeetings[startup._id]}
-                          className={`mt-2 w-full px-4 py-2 rounded-lg transition ${
-                            loadingMeetings[startup._id]
-                              ? "bg-gray-400 text-white cursor-wait"
-                              : "bg-green-600 text-white hover:bg-green-700"
-                          }`}
-                        >
-                          {loadingMeetings[startup._id] ? (
-                            <span className="flex items-center justify-center">
-                              <svg
-                                className="animate-spin h-5 w-5 mr-2 text-white"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                              >
-                                <circle
-                                  className="opacity-25"
-                                  cx="12"
-                                  cy="12"
-                                  r="10"
-                                  stroke="currentColor"
-                                  strokeWidth="4"
-                                ></circle>
-                                <path
-                                  className="opacity-75"
-                                  fill="currentColor"
-                                  d="M4 12a8 8 0 018-8v8H4z"
-                                ></path>
-                              </svg>
-                              Scheduling...
-                            </span>
-                          ) : (
-                            "Confirm Meeting"
-                          )}
-                        </button>
+    <div>
+      <h2 className="text-md font-semibold text-gray-800">{startup.startupName}</h2>
+      <p className="text-sm text-gray-500">{startup.industry}</p>
+    </div>
+  </div>
 
-                        <button
-                          onClick={() => setActiveStartupId(null)}
-                          className="mt-2 w-full px-4 py-2 text-sm bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        onClick={() => setActiveStartupId(startup._id)}
-                        disabled={!session}
-                        className={`mt-4 w-full px-4 py-2 rounded-lg transition ${
-                          session
-                            ? "bg-green-600 text-white hover:bg-green-700"
-                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        }`}
-                      >
-                        Schedule Meeting
-                      </button>
-                    )}
+  {/* Badges */}
+  <div className="flex gap-2 flex-wrap text-sm">
+    <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium">
+      Stage: {startup.stage}
+    </span>
+    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">
+      Funding: {startup.funding}
+    </span>
+  </div>
 
-              
+  {/* Website link */}
+  {startup.website && (
+    <a
+      href={startup.website}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center text-sm text-blue-600 hover:underline"
+    >
+      🌐 Visit Site
+    </a>
+  )}
 
-                <a
-                  href={startup.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                >
-                  Visit Website
-                </a>
-                <div className="mt-4 flex gap-4 items-center">
-                  {/* Like Button */}
-                  <button onClick={() => handleLike(startup)}>
-                  {likedStartups.has(startup._id) ? (
-                    <HeartSolid className="w-6 h-6 text-red-500 cursor-pointer" />
-                  ) : (
-                    <HeartOutline className="w-6 h-6 text-gray-400 cursor-pointer" />
-                  )}
-                </button>
+  {/* View + Invest + Like */}
+<div className="flex items-center justify-between space-x-2">
+  {/* View Button */}
+  <button
+    onClick={() => handleView(startup._id)}
+    className="px-4 py-1 bg-blue-700 text-white text-sm rounded-full hover:bg-blue-800 transition"
+  >
+    View
+  </button>
+
+  {/* Invest Button */}
+  <button
+  onClick={() => handleInvested(startup)}
+  className={`px-4 py-2 border rounded-lg text-sm font-semibold transition ${
+    investedStartups.has(startup._id)
+      ? 'bg-green-600 text-white border-green-600'
+      : 'text-green-600 border-green-600 hover:bg-green-50'
+  }`}
+>
+  {investedStartups.has(startup._id) ? 'Invested' : 'Mark as Invested'}
+</button>
 
 
-                <button
-                  onClick={() => handleInvested(startup)}
-                  className={`px-3 py-1 border rounded-lg text-sm transition ${
-                    investedStartups.has(startup._id)
-                      ? 'bg-green-600 text-white border-green-600'
-                      : 'text-green-600 border-green-600'
-                  }`}
-                >
-                  {investedStartups.has(startup._id) ? 'Invested' : 'Mark as Invested'}
-                </button>
+  {/* Like Button */}
+  <button onClick={() => handleLike(startup)}>
+    {likedStartups.has(startup._id) ? (
+      <HeartSolid className="w-5 h-5 text-red-500" />
+    ) : (
+      <HeartOutline className="w-5 h-5 text-gray-400" />
+    )}
+  </button>
+</div>
 
-                </div>
-                              </div>
-                            ))}
-                          </div>
+  
+
+  {/* Schedule Meeting */}
+  {scheduledStartups.has(startup._id) ? (
+    <button
+      className="w-full py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+      onClick={() => alert('Redirect to feedback form or handle feedback logic')}
+    >
+      Give Feedback
+    </button>
+  ) : activeStartupId === startup._id ? (
+    <>
+      <input
+        type="datetime-local"
+        className="w-full p-2 border rounded-md text-sm mt-2"
+        onChange={(e) =>
+          setSelectedDateTime((prev) => ({
+            ...prev,
+            [startup._id]: e.target.value,
+          }))
+        }
+      />
+      <button
+        onClick={async () => {
+          const data = await fetchName(email);
+          //const client_data = await fetchClientData(startup.client_mail);
+          console.log("photo",startup.photo)
+          scheduleMeeting(
+            startup._id,
+            startup.startupName,
+            startup.clientName,
+            startup.client_mail,
+            startup.photo||"",
+            data.fullName,
+            data.photo || "",
+            data.linkedIn
+          );
+        }}
+        disabled={loadingMeetings[startup._id]}
+        className={`mt-2 w-full px-4 py-2 rounded-lg transition ${
+                                loadingMeetings[startup._id]
+                                  ? "bg-gray-400 text-white cursor-wait"
+                                  : "bg-green-600 text-white hover:bg-green-700"
+                              }`}
+      >
+              {loadingMeetings[startup._id] ? (
+                                <span className="flex items-center justify-center">
+                                  <svg
+                                    className="animate-spin h-5 w-5 mr-2 text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <circle
+                                      className="opacity-25"
+                                      cx="12"
+                                      cy="12"
+                                      r="10"
+                                      stroke="currentColor"
+                                      strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                      className="opacity-75"
+                                      fill="currentColor"
+                                      d="M4 12a8 8 0 018-8v8H4z"
+                                    ></path>
+                                  </svg>
+                                  Scheduling...
+                                </span>
+                              ) : (
+                                "Confirm Meeting"
+                              )}
+                            </button>
+                            
+                            <button
+                              onClick={() => setActiveStartupId(null)}
+                              className="w-full py-2 text-sm mt-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
+                            >
+                              Cancel
+                            </button>
+                          </>
                         ) : (
-                          <p className="text-gray-500">No recommendations yet!</p>
+                          <button
+                            onClick={() => setActiveStartupId(startup._id)}
+                            disabled={!session}
+                            className={`w-full py-2 rounded-md transition ${
+                              session
+                                ? "bg-green-600 text-white hover:bg-green-700"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            }`}
+                          >
+                            Schedule Meeting
+                          </button>
+
+                          
                         )}
+                      </div>
+
+                        ))}
+                      </div>
 
 
                       {isPopupOpen && (

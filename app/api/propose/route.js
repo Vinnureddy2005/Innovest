@@ -13,6 +13,8 @@ export async function POST(req) {
     const funding = data.get("funding");
     const file = data.get("file");
     const client_mail= data.get("client_mail")
+    const clientName= data.get("clientname")
+    const photo = data.get("photo");
 
     if (!file || !file.name) {
       return NextResponse.json({ error: "File not provided" }, { status: 400 });
@@ -35,6 +37,8 @@ export async function POST(req) {
         name: file.name,
       },
       client_mail,
+      clientName,
+      photo
     });
 
     await newIdea.save();

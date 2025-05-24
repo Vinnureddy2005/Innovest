@@ -7,7 +7,7 @@ import nodemailer from 'nodemailer';
 export async function POST(request) {
   try {
      const body = await request.json();
-    const { accessToken, startDateTime, startupId,startupName, client_name,client_mail, investor_name, linkedIn,investor_email } = body;
+    const { accessToken, startDateTime, startupId,startupName, client_name,client_mail, clientphoto,investor_name, invphoto,linkedIn,investor_email } = body;
     console.log(body);
     if (!accessToken || !startDateTime || !startupId ||!startupName  || !client_name|| !client_mail || !investor_name || !investor_email  || !linkedIn) {
       return new Response(
@@ -55,8 +55,10 @@ export async function POST(request) {
       startDateTime,
       client_name,
       client_mail,
+      clientphoto,
       investor_email,
       investor_name,
+      invphoto,
       linkedIn
     });
 
