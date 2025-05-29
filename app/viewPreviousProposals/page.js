@@ -101,6 +101,7 @@ export default function ViewPreviousProposals() {
       formData.append('file', formValues.file);
     }
     
+
     
     try {
       const email = sessionStorage.getItem('email'); 
@@ -123,6 +124,42 @@ export default function ViewPreviousProposals() {
       alert('Error occurred during update.');
     }
   };
+
+  const [fileUrl, setFileUrl] = useState(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  //const [loading, setLoading] = useState(false); // ✅ Used here
+  const handleView = async (id) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/propose/${id}`);
+      if (response.status === 404) {
+        alert("No File Found");
+        setLoading(false);
+        return;
+      }
+      if (!response.ok) {
+        throw new Error('Failed to fetch the file');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      setFileUrl(url);
+      setIsPopupOpen(true);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const PopupModal = ({ fileUrl, onClose }) => (
+    <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-30">
+      <div className="rounded-lg border border-gray-300" style={{ width: '1000px', height: '842px' }}>
+        <button onClick={onClose} className="absolute top-2 right-2 text-white rounded-lg">close</button>
+        <iframe src={fileUrl} className="w-full h-full" title="File Preview" />
+      </div>
+    </div>
+  );
 
   return (
     <div className="flex min-h-screen">
@@ -233,20 +270,20 @@ export default function ViewPreviousProposals() {
                     </td>
 
                     <td className="p-3 border-b">
-                      {editingId === proposal._id ? (
-                        <input type="file" name="file" onChange={handleChange} />
-                      ) : proposal.file?.name ? (
-                        <a
-                          href={`/api/propose/${proposal._id}`}
-                          target="_blank"
-                          className="text-blue-500 underline"
-                        >
-                          View File
-                        </a>
-                      ) : (
-                        '—'
-                      )}
-                    </td>
+                        {editingId === proposal._id ? (
+                          <input type="file" name="file" onChange={handleChange} />
+                        ) : proposal?._id ? (
+                          <button
+                            onClick={() => handleView(proposal._id)}
+                            className="px-4 py-1 bg-blue-700 text-white text-sm rounded-full hover:bg-blue-800 transition"
+                          >
+                            View
+                          </button>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
+
 
                     <td className="p-3 border-b">
                       {editingId === proposal._id ? (
@@ -276,6 +313,12 @@ export default function ViewPreviousProposals() {
             </table>
           </div>
         )}
+         {isPopupOpen && (
+                          <PopupModal 
+                            fileUrl={fileUrl} 
+                            onClose={() => setIsPopupOpen(false)} 
+                          />
+                        )}
       </div>
     </div>
   );

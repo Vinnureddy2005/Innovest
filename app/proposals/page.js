@@ -52,6 +52,7 @@ const [isPopupOpen, setIsPopupOpen] = useState(false);
     const fetchProposals = async () => {
     const response = await fetch(`/api/proposals?email=${encodeURIComponent(email)}`);
       const data = await response.json();
+      console.log(data)
       setProposals(data);
       setLoading(false);
     };

@@ -79,42 +79,45 @@ export async function POST(req) {
     const data = await pdfExtract(buffer); // Extract text
 
     const text = data.text.toLowerCase(); // Extracted text in lowercase
-    console.log(text)
+    const cleanedText = text.replace(/[\s:]/g, '').toLowerCase();
+
+    //console.log(text)
 
 
     const requiredFields = [
-        'FounderName(s):',
-        'LinkedInProfile(s):',
-        'Email:',
-        'ContactNumber:',
-        'TotalTeamSize:',
-        'KeyTeamRoles:',
-        'KeyTeamMemberProfiles:',
-        'One-linerElevatorPitch:',
-        'FullDescription/Problem&Solution:',
-        'TargetMarket:',
-        'RevenueModel(Howdoyoumakemoney?):',
-        'TractionSoFar(metrics,users,revenue,etc.):',
-        'Competitors&Differentiation:',
-        'Go-To-MarketStrategy:',
-        'Areyoucurrentlyseekingfunding?(Yes/No)',
-        'Howmuchareyouseeking?(inUSDorINR)',
-        'Howwillthefundsbeused?',
-        'PitchDeckUpload:',
-      ];
-      
+  'FounderName(s)',
+  'LinkedInProfile(s)',
+  'Email',
+  'ContactNumber',
+  'TotalTeamSize',
+  'KeyTeamRoles',
+  'KeyTeamMemberProfiles',
+  'One-linerElevatorPitch',
+  'FullDescription/Problem&Solution',
+  'TargetMarket',
+  'RevenueModel',
+  'TractionSoFar',
+  'Competitors&Differentiation',
+  'Go-To-MarketStrategy',
+  'Areyoucurrentlyseekingfunding?(Yes/No)',
+  'Howmuchareyouseeking?(inUSDorINR)',
+  'Howwillthefundsbeused?',
+  'PitchDeckUpload'
+];
 
-    const found = [];
-    const missing = [];
+const found = [];
+const missing = [];
 
-    for (const field of requiredFields) {
-      if (text.includes(field.toLowerCase())) {
-        found.push(field);
-      } else {
-        missing.push(field);
-      }
-    }
+for (const field of requiredFields) {
+  const cleanedField = field.replace(/[\s:]/g, '').toLowerCase();
+  if (cleanedText.includes(cleanedField)) {
+    found.push(field);
+  } else {
+    missing.push(field);
+  }
+}
 
+    console.log(missing)
     return NextResponse.json(
       {
         valid: missing.length === 0,
