@@ -6,7 +6,7 @@ import {
   FaLightbulb,
   FaClipboardList,
 } from 'react-icons/fa';
-
+import Sidebar from '../client_sidebar/page';
 export default function ClientFeedbackPage() {
   const [email, setEmail] = useState(null);
   const [feedbacks, setFeedbacks] = useState([]);
@@ -71,10 +71,16 @@ export default function ClientFeedbackPage() {
   }
 
   return (
-    <div> 
-      <h1 className="font-bold text-center text-2xl mb-6">Your Feedbacks</h1>
+  <div className="flex min-h-screen">
+      {/* Sidebar on the left */}
+      <Sidebar />
 
-    <div className="p-4 grid gap-4 md:grid-cols-4">
+      {/* Main content on the right */}
+      <div className="flex-1 p-6">       <h2 className="text-3xl font-semibold mb-8 border-b pb-2 border-gray-300">
+            Your Feedbacks
+          </h2>
+
+    <div className="p-4 grid gap-4 md:grid-cols-3">
       {feedbacks.map((fb) => (
         <div
           key={fb._id}
@@ -148,6 +154,7 @@ export default function ClientFeedbackPage() {
           </div>
         </div>
       ))}
+    </div>
     </div>
     </div>
   );

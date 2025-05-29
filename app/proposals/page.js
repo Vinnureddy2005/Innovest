@@ -295,7 +295,7 @@ console.log(scheduledStartups)
          <main className="flex-1 p-6 overflow-y-auto">
            {/* Header */}
           <div className="flex justify-between items-center mb-6">
-             <h1 className="text-3xl font-bold text-gray-800">Recommended Startups</h1>
+             <h1 className="text-3xl font-bold text-gray-800">All Startups</h1>
              {!session ? (
                <div className="flex flex-col items-start sm:items-end">
       <p className="text-m text-gray-800 mb-1">

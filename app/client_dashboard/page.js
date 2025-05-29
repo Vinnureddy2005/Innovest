@@ -115,7 +115,7 @@ export default function DashboardPage() {
         <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
           <h2 className="text-2xl font-semibold mb-4">Steps to Get Started</h2>
           <ol className="list-decimal pl-6 space-y-2">
-            <li>Go to the <strong>Propose</strong> page and submit your startup idea with required files.</li>
+            <li>Go to the <strong>Propose</strong> page and submit your startup idea with required file by downloading the template .</li>
             <li>View and Edit your submissions from the <strong>View & Edit</strong> section.</li>
             <li>Grab a chance to find investors by participating in scheduled <strong>Consultations</strong> via Google Meet.</li>
             <li>Collect <strong>Feedback</strong> from investors and refine your pitch.</li>

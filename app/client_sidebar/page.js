@@ -50,10 +50,10 @@ export default function Sidebar({ darkMode, handleLogout }) {
       
       {/* Top Navigation */}
       <ul className="space-y-6 text-lg">
-        <h2 className="text-2xl font-bold mb-10">Dashboard</h2>
+        <h2 className="text-2xl font-bold mb-10">Innovest🚀</h2>
         <li className="flex items-center gap-2 hover:text-blue-500">
           <LayoutDashboard size={20} />
-          <Link href={`/client_dashboard?email=${encodeURIComponent(email)}`}>Home</Link>
+          <Link href={`/client_dashboard?email=${encodeURIComponent(email)}`}>Dashboard</Link>
         </li>
         <li className="flex items-center gap-2 hover:text-blue-500">
           <FilePlus2 size={20} />

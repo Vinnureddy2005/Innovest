@@ -138,7 +138,7 @@ export default function ViewPreviousProposals() {
           <Search size={20} />
           <input
             type="text"
-            placeholder="Search Proposals..."
+            placeholder="Search Startup Names..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="px-4 py-2 rounded-xl border border-gray-300 shadow-md w-full"
@@ -179,11 +179,10 @@ export default function ViewPreviousProposals() {
                           className="border rounded p-1"
                         >
                           <option value="">Select Stage</option>
-                          <option value="Idea">Idea</option>
-                          <option value="Prototype">Prototype</option>
-                          <option value="MVP">MVP</option>
-                          <option value="Scaling">Scaling</option>
-                          <option value="Revenue-Generating">Revenue-Generating</option>
+                          <option value="Early-Stage">Early-Stage</option>
+                          <option value="Growth-Stage">Growth-Stage</option>
+                          <option value="Late-Stage">Late-Stage</option>
+                          
                         </select>
                       ) : (
                         proposal.stage
@@ -200,9 +199,11 @@ export default function ViewPreviousProposals() {
                         >
                           <option value="">Select Funding</option>
                           <option value="None">None</option>
-                          <option value="Seed">Seed</option>
-                          <option value="Series A">Series A</option>
-                          <option value="Series B+">Series B+</option>
+                          'None (Self-funded)',
+                          <option value="<$50k">&lt; $50k</option>
+                          <option value="$50k-$500k">$50k-$500k</option>
+                          <option value="$500k-$5M">$500k-$5M</option>
+                          <option value="$5M+">$5M+</option>
                         </select>
                       ) : (
                         proposal.funding
