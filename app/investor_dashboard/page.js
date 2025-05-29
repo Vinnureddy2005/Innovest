@@ -6,7 +6,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import DashboardPage from "../investor_sidebar/page";
-
+import FeedbackPopup from '../investor_feedback/page';
 const Dashboard = () => {
   const [recommendedStartups, setRecommendedStartups] = useState([]);
   const [cfRecommendedStartups, setCFRecommendedStartups] = useState([]);
@@ -14,6 +14,7 @@ const Dashboard = () => {
   const email = searchParams.get('email');
   const [likedStartups, setLikedStartups] = useState(new Set());
   const [investedStartups, setInvestedStartups] = useState(new Set());
+const [feedbackStartupName, setFeedbackStartupName] = useState(null);
 
   useEffect(() => {
     if (!email) return;
@@ -288,8 +289,12 @@ const Dashboard = () => {
 
 console.log(scheduledStartups)
 
-     
+ const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
+  const openFeedback = () => setIsFeedbackOpen(true);
+  const closeFeedback = () => setIsFeedbackOpen(false);
+
+  const [feedbackMail,setfeedbackMail] =useState("");
 
   return (
     <div className="min-h-screen flex bg-gray-100">
@@ -411,8 +416,14 @@ console.log(scheduledStartups)
   {scheduledStartups.has(startup._id) ? (
     <button
       className="w-full py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-      onClick={() => alert('Redirect to feedback form or handle feedback logic')}
+
+  onClick={() => {
+    setFeedbackStartupName(startup.startupName);
+    setfeedbackMail(startup.client_mail); 
+    openFeedback();
+  }}
     >
+
       Give Feedback
     </button>
   ) : activeStartupId === startup._id ? (
@@ -513,6 +524,15 @@ console.log(scheduledStartups)
                             onClose={() => setIsPopupOpen(false)} 
                           />
                         )}
+                        {isFeedbackOpen && (
+  <FeedbackPopup
+    startupName={feedbackStartupName}
+    clientEmail={feedbackMail}
+    onClose={closeFeedback}
+  />
+)}
+
+
                         </main>
                     </div>
                   );

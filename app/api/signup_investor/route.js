@@ -9,7 +9,7 @@ export async function POST(req) {
     const {
       fullName, email, phone, password, confirmPassword,
       companyName, linkedIn, investmentFocus, preferredIndustries,
-      investmentSize, pastInvestments, philosophy,
+      investmentSize, 
       membershipPlan,validUpto,transactionId
     } = data;
 
@@ -34,8 +34,7 @@ export async function POST(req) {
       investmentFocus,
       preferredIndustries,
       investmentSize,
-      pastInvestments,
-      philosophy,
+      
       membershipPlan,
       transactionId,
       validUpto

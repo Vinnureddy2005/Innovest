@@ -23,6 +23,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/components/SessionWrapper.jsx", "app/components/SessionWrapper.jsx", "app/api/auth/[...nextauth]/route.js", "app/api/auth/[...nextauth]/route.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/components/SessionWrapper.jsx", "app/components/SessionWrapper.jsx", "app/api/auth/[...nextauth]/route.js", "app/api/auth/[...nextauth]/route.js", "app/components/works.js", "app/components/contact.js"],
   "exclude": ["node_modules"]
 }
