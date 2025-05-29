@@ -5,8 +5,8 @@ import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import FeedbackPopup from '../investor_feedback/page';
 import DashboardPage from "../investor_sidebar/page";
-
 const Dashboard = () => {
   const [recommendedStartups, setRecommendedStartups] = useState([]);
   const [cfRecommendedStartups, setCFRecommendedStartups] = useState([]);
@@ -14,6 +14,7 @@ const Dashboard = () => {
   const email = searchParams.get('email');
   const [likedStartups, setLikedStartups] = useState(new Set());
   const [investedStartups, setInvestedStartups] = useState(new Set());
+const [feedbackStartupName, setFeedbackStartupName] = useState(null);
 
   useEffect(() => {
     if (!email) return;
@@ -80,6 +81,8 @@ const Dashboard = () => {
     fetchInvestorResponses();
   }, [email]);
 
+  
+  
   const fetchName = async (email) => {
     try {
       const response = await fetch('/api/inv_name', {
@@ -90,6 +93,8 @@ const Dashboard = () => {
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
+      
+      console.log("inv",data)
       return data;
     } catch (err) {
       console.error('Error fetching name:', err.message);
@@ -251,6 +256,7 @@ const Dashboard = () => {
   };
 
   const allRecommendedStartups = [...recommendedStartups, ...cfRecommendedStartups];
+  console.log(allRecommendedStartups)
   const uniqueStartups = Array.from(
     new Map(allRecommendedStartups.map(startup => [startup._id, startup])).values()
   );
@@ -288,8 +294,14 @@ const Dashboard = () => {
 
 console.log(scheduledStartups)
 
-     
+ const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
+  const openFeedback = () => setIsFeedbackOpen(true);
+  const closeFeedback = () => setIsFeedbackOpen(false);
+ 
+  
+  const [Invphoto,setInvphoto] =useState("");
+  const [feedbackMail,setfeedbackMail] =useState("");
 
   return (
     <div className="min-h-screen flex bg-gray-100">
@@ -411,8 +423,19 @@ console.log(scheduledStartups)
   {scheduledStartups.has(startup._id) ? (
     <button
       className="w-full py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-      onClick={() => alert('Redirect to feedback form or handle feedback logic')}
+
+  onClick={async () => {
+    console.log("button clicked");
+    const data= await fetchName(email);
+    console.log("data came",data.photo)
+    setFeedbackStartupName(startup.startupName);
+    setfeedbackMail(startup.client_mail); 
+    setInvphoto(data.photo)
+    
+    openFeedback();
+  }}
     >
+
       Give Feedback
     </button>
   ) : activeStartupId === startup._id ? (
@@ -513,6 +536,16 @@ console.log(scheduledStartups)
                             onClose={() => setIsPopupOpen(false)} 
                           />
                         )}
+                        {isFeedbackOpen && (
+  <FeedbackPopup
+    startupName={feedbackStartupName}
+    clientEmail={feedbackMail}
+    Invphoto={Invphoto}
+    onClose={closeFeedback}
+  />
+)}
+
+
                         </main>
                     </div>
                   );

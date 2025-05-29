@@ -22,8 +22,6 @@ export default function SignupTabs() {
     investmentFocus: '',
     preferredIndustries: [],
     investmentSize: '',
-    pastInvestments: '',
-    philosophy: '',
     membershipPlan: '',
   });
   const [loading, setLoading] = useState(false);
@@ -108,7 +106,7 @@ export default function SignupTabs() {
           >
             <Sparkles className="mx-auto text-yellow-300 w-10 h-10 animate-pulse" />
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-              Investor Sign-Up 🌟
+             Welcome to Innovest 🚀
             </h1>
             <p className="text-md max-w-md mx-auto text-gray-200">
               Connect with startups and scale your investment journey with us.
@@ -227,8 +225,6 @@ export default function SignupTabs() {
                       <option value="pro">Annual</option>
                     </select>
 
-                    <textarea name="pastInvestments" placeholder="Past Investments (if any)" value={formData.pastInvestments} onChange={handleChange} className="input" rows={2} />
-                    <textarea name="philosophy" placeholder="Investment Philosophy / Criteria" value={formData.philosophy} onChange={handleChange} className="input" rows={2} />
                   </div>
 
                   <div className="flex justify-center pt-4">

@@ -42,14 +42,7 @@ const InvestorSchema = new mongoose.Schema({
     type: String,
     enum: ['<$50k', '$50k-$500k', '$500k-$5M', '$5M+'],
   },
-  pastInvestments: {
-    type: String,
-    default: '',
-  },
-  philosophy: {
-    type: String,
-    default: '',
-  },
+  
 
   // Membership
   membershipPlan:{

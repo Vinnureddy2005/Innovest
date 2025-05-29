@@ -87,7 +87,7 @@ const [error, setError] = useState('');
             className="text-white text-center space-y-4"
           >
             <Sparkles className="mx-auto text-yellow-300 w-10 h-10 animate-pulse" />
-            <h1 className="text-4xl font-extrabold tracking-tight">Welcome to Startup Hub 🚀</h1>
+            <h1 className="text-4xl font-extrabold tracking-tight">Welcome to Innovest 🚀</h1>
             <p className="text-md max-w-sm mx-auto text-gray-200">
             Pitch your ideas, get expert feedback, and take your venture to the next level
             </p>
