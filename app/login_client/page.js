@@ -3,7 +3,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-
+import Link from 'next/link';
 export default function LoginForm() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [message, setMessage] = useState('');
@@ -156,7 +156,7 @@ const [selectedPlan, setSelectedPlan] = useState('');
   )}
 
             <p className="text-sm text-center text-white">
-              New User? <a href="#" className="text-purple-300 hover:underline">Signup</a>
+              New User? <Link href="/signup_client" className="text-purple-300 hover:underline">Signup</Link>
             </p>
           </form>
         </div>

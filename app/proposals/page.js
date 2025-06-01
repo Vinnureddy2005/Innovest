@@ -355,7 +355,7 @@ console.log(scheduledStartups)
              )}
            </div>
            {/* Filter Panel */}
-<div className="mb-6 p-3 bg-white rounded-2xl shadow-lg space-y-6 border border-gray-200">
+<div className="mb-6 p-4 bg-white rounded-2xl shadow-lg space-y-6 border border-gray-200">
   <h2 className="text-xl font-semibold text-gray-700">🎯 Filter Startups</h2>
 
   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -737,18 +737,7 @@ console.log(scheduledStartups)
   <p className="text-gray-500 text-center mt-10">No proposals found.</p>
 )}
 
-                           <button
-  onClick={() => {
-    setSelectedIndustries([]);
-    setSelectedStages([]);
-    setSelectedFunding([]);
-    setShowLiked(false);
-    setShowInvested(false);
-  }}
-  className="mt-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
->
-  Clear Filters
-</button>
+     
 {isPopupOpen && (
                           <PopupModal 
                             fileUrl={fileUrl} 
