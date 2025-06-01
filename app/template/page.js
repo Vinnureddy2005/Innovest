@@ -1,6 +1,9 @@
 'use client';
+import { useRouter } from 'next/navigation';
 
 export default function Template() {
+    const router = useRouter(); 
+
   return (
     <div className="min-h-screen bg-indigo-50 flex items-center justify-center px-4">
       <div className="bg-white border-l-4 border-indigo-500 p-8 rounded-xl shadow-lg max-w-xl w-full">
@@ -23,6 +26,14 @@ export default function Template() {
           </a>
         </div>
       </div>
+       <button
+      onClick={() => router.push('/client_dashboard')}
+        className="fixed bottom-6 left-8 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-blue-600 z-50"
+    >
+      Back
+    </button>
     </div>
   );
 }
+
+

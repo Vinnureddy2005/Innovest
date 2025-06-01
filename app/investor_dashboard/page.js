@@ -3,7 +3,7 @@
 import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import FeedbackPopup from '../investor_feedback/page';
 import DashboardPage from "../investor_sidebar/page";
@@ -81,8 +81,6 @@ const [feedbackStartupName, setFeedbackStartupName] = useState(null);
     fetchInvestorResponses();
   }, [email]);
 
-  
-  
   const fetchName = async (email) => {
     try {
       const response = await fetch('/api/inv_name', {
@@ -93,8 +91,6 @@ const [feedbackStartupName, setFeedbackStartupName] = useState(null);
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
-      
-      console.log("inv",data)
       return data;
     } catch (err) {
       console.error('Error fetching name:', err.message);
@@ -254,11 +250,14 @@ const [feedbackStartupName, setFeedbackStartupName] = useState(null);
       setLoading(false);
     }
   };
-
+  const router = useRouter(); 
   const allRecommendedStartups = [...recommendedStartups, ...cfRecommendedStartups];
-  console.log(allRecommendedStartups)
   const uniqueStartups = Array.from(
-    new Map(allRecommendedStartups.map(startup => [startup._id, startup])).values()
+    new Map(
+      allRecommendedStartups
+       // Only startups with invested: false
+        .map(startup => [startup._id, startup])
+    ).values()
   );
 
   const PopupModal = ({ fileUrl, onClose }) => (
@@ -298,23 +297,27 @@ console.log(scheduledStartups)
 
   const openFeedback = () => setIsFeedbackOpen(true);
   const closeFeedback = () => setIsFeedbackOpen(false);
- 
-  
-  const [Invphoto,setInvphoto] =useState("");
-  const [feedbackMail,setfeedbackMail] =useState("");
 
+  const [feedbackMail,setfeedbackMail] =useState("");
+  const [Invphoto,setInvphoto] =useState("");
+  const [startupId,setStartupId] =useState("");
+ const handleLogout = () => {
+    sessionStorage.removeItem('email');
+    localStorage.removeItem('authToken'); 
+    router.push('/'); 
+  };
   return (
     <div className="min-h-screen flex bg-gray-100">
       <aside className="w-64 bg-white border-r shadow-md hidden md:block">
         <div className="sticky top-0 h-screen overflow-y-auto p-4">
-          <DashboardPage />
+          <DashboardPage email={email} handleLogout={handleLogout}/>
         </div>
       </aside>
 
       <main className="flex-1 p-6 overflow-y-auto">
     
        <div className="flex justify-between items-center mb-6">
-             <h1 className="text-3xl font-bold text-gray-800">Recommended Startups</h1>
+             <h1 className="text-3xl font-bold text-gray-800">AI Recommended Startups</h1>
              {!session ? (
                <div className="flex flex-col items-start sm:items-end">
       <p className="text-m text-gray-800 mb-1">
@@ -346,7 +349,8 @@ console.log(scheduledStartups)
   {uniqueStartups.map((startup) => (
     <div
   key={startup._id}
-  className="bg-white rounded-xl shadow-md p-4 w-full max-w-sm flex flex-col justify-between space-y-3"
+   className="bg-white rounded-xl shadow-md p-4 w-full max-w-sm flex flex-col justify-between space-y-3"
+  
 >
   {/* Top Row: Logo + Text */}
   <div className="flex items-center space-x-4">
@@ -375,7 +379,8 @@ console.log(scheduledStartups)
   {/* Website link */}
   {startup.website && (
     <a
-      href={startup.website}
+      href={startup.website.startsWith('http') ? startup.website : `https://${startup.website}`}
+
       target="_blank"
       rel="noopener noreferrer"
       className="flex items-center text-sm text-blue-600 hover:underline"
@@ -421,23 +426,24 @@ console.log(scheduledStartups)
 
   {/* Schedule Meeting */}
   {scheduledStartups.has(startup._id) ? (
-    <button
-      className="w-full py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-
+   <button
+  className="pop inline-flex items-center justify-center px-2.5 py-1 text-xs font-medium bg-purple-300 text-purple-900 rounded-full shadow-sm hover:bg-purple-400 transition duration-300"
   onClick={async () => {
     console.log("button clicked");
-    const data= await fetchName(email);
-    console.log("data came",data.photo)
+    const data = await fetchName(email);
+    console.log("data came", data.photo);
     setFeedbackStartupName(startup.startupName);
-    setfeedbackMail(startup.client_mail); 
-    setInvphoto(data.photo)
-    
+    setfeedbackMail(startup.client_mail);
+    setInvphoto(data.photo);
+    setStartupId(startup._id);
     openFeedback();
   }}
-    >
+>
+  💬 Give Feedback
+</button>
 
-      Give Feedback
-    </button>
+
+
   ) : activeStartupId === startup._id ? (
     <>
       <input
@@ -537,13 +543,14 @@ console.log(scheduledStartups)
                           />
                         )}
                         {isFeedbackOpen && (
-  <FeedbackPopup
-    startupName={feedbackStartupName}
-    clientEmail={feedbackMail}
-    Invphoto={Invphoto}
-    onClose={closeFeedback}
-  />
-)}
+                              <FeedbackPopup
+                              startupId={startupId}
+                                startupName={feedbackStartupName}
+                                clientEmail={feedbackMail}
+                                Invphoto={Invphoto}
+                                onClose={closeFeedback}
+                              />
+                            )}
 
 
                         </main>
@@ -552,3 +559,4 @@ console.log(scheduledStartups)
                 };
 
 export default Dashboard;
+

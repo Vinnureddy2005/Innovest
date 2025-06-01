@@ -43,7 +43,8 @@ export default function InvestorMeetingsPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-r from-white to-gray-100 text-gray-800">
+  
+       <div className="flex min-h-screen bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800">
       <Sidebar handleLogout={handleLogout} />
 
       <div className="flex-1 p-8">

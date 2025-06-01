@@ -1,4 +1,5 @@
 import { connectToDB } from '@/lib/mongodb';
+import Meeting from '@/models/Client_Meeting';
 import Feedback from '@/models/Feedback';
 import { NextResponse } from 'next/server';
 
@@ -15,17 +16,20 @@ export async function POST(req) {
       overallRating,
       investorName,
       investorEmail,
+      startupId,
       startupName,
       clientEmail,
       date,
       Invphoto
     } = body;
 
-    if (!clarity || !feasibility || !uniqueness || !overallRating || !investorName || !investorEmail ||!startupName ||!clientEmail || !date) {
+    if (!clarity || !feasibility || !uniqueness || !overallRating || !investorName || !investorEmail|| !startupId||!startupName ||!clientEmail || !date) {
       return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
     }
 
     await connectToDB();
+
+    await Meeting.deleteOne({ startupId: startupId });
 
     const newFeedback = new Feedback({
       clarity,
@@ -40,6 +44,8 @@ export async function POST(req) {
       date,
       Invphoto
     });
+
+
 
     await newFeedback.save();
 

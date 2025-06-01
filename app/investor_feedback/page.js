@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 
-const FeedbackPopup = ({startupName,clientEmail,Invphoto, onClose }) => {
+const FeedbackPopup = ({startupId,startupName,clientEmail,Invphoto, onClose }) => {
 
 const now = new Date();
 const day = String(now.getDate()).padStart(2, '0');
@@ -12,6 +12,7 @@ const today = `${day}-${month}-${year}`;
   const [feedback, setFeedback] = useState({
     investorName: "",
     investorEmail: "",
+    startupId:"",
     startupName:"",
     clarity: "",
     feasibility: "",
@@ -32,7 +33,8 @@ const today = `${day}-${month}-${year}`;
     investorEmail: email || "",
     startupName: startupName || "",
     clientEmail:clientEmail||"",
-    Invphoto:Invphoto||""
+    Invphoto:Invphoto||"",
+    startupId:startupId||""
   }));
 
   if (email) {

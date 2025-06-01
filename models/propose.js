@@ -18,6 +18,7 @@ const proposeSchema = new mongoose.Schema({
   client_mail:String ,
   clientName :String,
   photo: { type: String },
+  invested: {type:Boolean}
 }, { timestamps: true });
 
 export default mongoose.models.Propose || mongoose.model('Propose', proposeSchema);

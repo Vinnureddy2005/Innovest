@@ -6,6 +6,10 @@ const InvestorResponseSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  clientEmail:{
+    type: String,
+    required: true,
+  },
   investorEmail: {
     type: String,
     required: true,

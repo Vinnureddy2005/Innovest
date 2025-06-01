@@ -38,7 +38,8 @@ export async function POST(req) {
       },
       client_mail,
       clientName,
-      photo
+      photo,
+      invested:false
     });
 
     await newIdea.save();

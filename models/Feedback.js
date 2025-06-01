@@ -8,6 +8,7 @@ const FeedbackSchema = new mongoose.Schema({
   overallRating: String,
   investorName: String,       
   investorEmail: String,   
+  startupId:String,
   startupName:String,   
   clientEmail:String,
   date:String,

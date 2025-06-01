@@ -1,6 +1,5 @@
 'use client';
 
-import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -71,6 +70,39 @@ export default function DashboardPage() {
       });
   }, [clientMail]);
 
+ const [count, setCount] = useState(0);
+  useEffect(() => {
+    const fetchInvestedCount = async () => {
+      try {
+        console.log("Fetching invested count for:", clientMail);
+
+        const res = await fetch("/api/invested_count", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ clientEmail:clientMail }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch count");
+        }
+
+        const data = await res.json();
+        setCount(data.investedCount);
+      } catch (error) {
+        console.error("Error fetching invested count:", error);
+        setCount("Error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (clientMail) {
+      fetchInvestedCount();
+    }
+  }, [clientMail]);
+
   const handleLogout = () => {
     sessionStorage.removeItem('email');
     localStorage.removeItem('authToken'); 
@@ -95,7 +127,7 @@ export default function DashboardPage() {
               Template
             </Link>
 
-            <Bell size={24} className="text-gray-600 dark:text-white cursor-pointer" />
+            {/* <Bell size={24} className="text-gray-600 dark:text-white cursor-pointer" /> */}
           </div>
         </div>
 
@@ -104,6 +136,10 @@ export default function DashboardPage() {
           <div className="bg-blue-100 dark:bg-blue-800 p-6 rounded-xl shadow-md">
             <h2 className="text-xl font-semibold mb-2">Total Proposals</h2>
             <p className="text-3xl font-bold">{proposalsCount}</p>
+          </div>
+           <div className="bg-blue-100 dark:bg-blue-800 p-6 rounded-xl shadow-md">
+            <h2 className="text-xl font-semibold mb-2">Your Starup  Investments</h2>
+            <p className="text-3xl font-bold">{count}</p>
           </div>
           <div className="bg-green-100 dark:bg-green-800 p-6 rounded-xl shadow-md">
             <h2 className="text-xl font-semibold mb-2">Upcoming Consultations</h2>
@@ -115,7 +151,7 @@ export default function DashboardPage() {
         <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
           <h2 className="text-2xl font-semibold mb-4">Steps to Get Started</h2>
           <ol className="list-decimal pl-6 space-y-2">
-            <li>Go to the <strong>Propose</strong> page and submit your startup idea with required files.</li>
+            <li>Go to the <strong>Propose</strong> page and submit your startup idea with required file by downloading the template .</li>
             <li>View and Edit your submissions from the <strong>View & Edit</strong> section.</li>
             <li>Grab a chance to find investors by participating in scheduled <strong>Consultations</strong> via Google Meet.</li>
             <li>Collect <strong>Feedback</strong> from investors and refine your pitch.</li>

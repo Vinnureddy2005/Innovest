@@ -5,7 +5,7 @@ import Propose from '@/models/propose'; // Import the startup model
 
 export async function POST(req) {
   const body = await req.json();
-  const { investorName, email, startupId, startupName, liked, invested } = body;
+  const { investorName, clientEmail, email, startupId, startupName, liked, invested } = body;
 
   if (!email || !startupId) {
     return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
@@ -17,7 +17,7 @@ export async function POST(req) {
     const existing = await InvestorResponse.findOne({ investorEmail: email, startupId });
 
     let likeChange = 0; // Track like change
-
+    const investdone=false;
     const update = {};
     if (existing) {
       if (liked !== undefined) {
@@ -32,17 +32,26 @@ export async function POST(req) {
         update.liked = liked;
         likeChange = liked ? 1 : 0;
       }
-      if (invested !== undefined) update.invested = invested;
+      if (invested !== undefined) {
+        update.invested = invested;
+       await Propose.findByIdAndUpdate(startupId, { invested: true });
+
+
+      }
       if (investorName) update.investorName = investorName;
       update.startupId = startupId;
+      update.clientEmail= clientEmail;
       update.startupName = startupName;
     }
-
+    
     const response = await InvestorResponse.findOneAndUpdate(
       { investorEmail: email, startupId },
       { $set: update },
       { upsert: true, new: true }
     );
+
+    
+   
 
     // ✅ Update likes in the startup model if there's a change
     if (likeChange !== 0) {

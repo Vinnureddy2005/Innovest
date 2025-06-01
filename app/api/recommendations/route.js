@@ -17,7 +17,9 @@ export async function GET(req) {
     }
 
     // 2. Fetch all proposals
-    const proposals = await Propose.find({}, { file: 0 });
+     const proposals = await Propose.find({}, { file: 0 });
+
+
     if (proposals.length === 0) {
       return new Response(JSON.stringify({ message: 'No proposals found' }), { status: 404 });
     }
@@ -27,7 +29,9 @@ export async function GET(req) {
     const investorFunding = (investor.investmentSize || '').toLowerCase();
 
     // 3. Filter proposals that match industry (case-insensitive)
-    const filtered = proposals.filter(p =>
+    const InvestedFilter= proposals.filter(startup => startup.invested === false) ;
+    const filtered = InvestedFilter.filter(p =>
+       
       investorIndustries.includes((p.industry || '').toLowerCase())
     );
 

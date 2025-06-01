@@ -3,7 +3,6 @@
 "use client";
 
 import { loadStripe } from "@stripe/stripe-js";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -174,7 +173,7 @@ export default function Payment() {
 
           {qrSrc && (
             <div className="flex justify-center">
-              <Image
+              <img
                 src={qrSrc}
                 alt="UPI QR Code"
                 className="w-48 h-48 border border-gray-300 rounded-xl shadow-md"

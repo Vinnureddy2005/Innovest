@@ -1,12 +1,17 @@
+
+
+
 "use client"
 import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import FeedbackPopup from '../investor_feedback/page';
 import SidebarPage from "../investor_sidebar/page";
 
 const Proposals = () => {
+  const router = useRouter(); 
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -21,7 +26,32 @@ const [showLiked, setShowLiked] = useState(false);
 const [showInvested, setShowInvested] = useState(false);
 const [fileUrl, setFileUrl] = useState(null);
 const [isPopupOpen, setIsPopupOpen] = useState(false);
+const [feedbackStartupName, setFeedbackStartupName] = useState(null);
+const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+ const openFeedback = () => setIsFeedbackOpen(true);
+const closeFeedback = () => setIsFeedbackOpen(false);
 
+const [feedbackMail,setfeedbackMail] =useState("");
+const [Invphoto,setInvphoto] =useState("");
+const [startupId,setStartupId] =useState("");
+const [industryDropdownOpen, setIndustryDropdownOpen] = useState(false);
+const [stageDropdownOpen, setStageDropdownOpen] = useState(false);
+const [fundingDropdownOpen, setFundingDropdownOpen] = useState(false);
+const industries = [
+  "Technology", "Healthcare", "Finance", "Education", "Retail and E-commerce",
+  "Environment and Energy", "Real Estate and Construction", "Media and Entertainment",
+  "Transportation and Logistics", "Aerospace and Defense", "Food and Agriculture",
+  "Travel and Hospitality", "Legal and Compliance", "Consumer Services"
+];
+ const stages = [
+    "Idea", "Prototype", "Minimum Viable Product (MVP)", "Scaling",
+    "Revenue-Generating", "Growth", "Exit"
+  ];
+
+  const fundings = [
+    "None", "Pre-Seed", "Seed", "Series A", "Series B",
+    "Series C", "Series D+", "IPO/Acquired"
+  ];
 
  const [scheduledStartups, setScheduledStartups] = useState(new Set());
   useEffect(() => {
@@ -52,7 +82,6 @@ const [isPopupOpen, setIsPopupOpen] = useState(false);
     const fetchProposals = async () => {
     const response = await fetch(`/api/proposals?email=${encodeURIComponent(email)}`);
       const data = await response.json();
-      console.log(data)
       setProposals(data);
       setLoading(false);
     };
@@ -279,7 +308,11 @@ const PopupModal = ({ fileUrl, onClose }) => (
     </div>
   </div>
 );
-
+  const handleLogout = () => {
+    sessionStorage.removeItem('email');
+    localStorage.removeItem('authToken'); 
+    router.push('/'); 
+  };
 
 
 console.log(scheduledStartups)
@@ -288,7 +321,7 @@ console.log(scheduledStartups)
          {/* Sidebar */}
          <aside className="w-64 bg-white border-r shadow-md hidden md:block">
            <div className="sticky top-0 h-screen overflow-y-auto p-4">
-             <SidebarPage />
+             <SidebarPage handleLogout={handleLogout}/>
            </div>
          </aside>
    
@@ -296,7 +329,7 @@ console.log(scheduledStartups)
          <main className="flex-1 p-6 overflow-y-auto">
            {/* Header */}
           <div className="flex justify-between items-center mb-6">
-             <h1 className="text-3xl font-bold text-gray-800">Recommended Startups</h1>
+             <h1 className="text-3xl font-bold text-gray-800">All Startups</h1>
              {!session ? (
                <div className="flex flex-col items-start sm:items-end">
       <p className="text-m text-gray-800 mb-1">
@@ -324,118 +357,181 @@ console.log(scheduledStartups)
            {/* Filter Panel */}
 <div className="mb-6 p-3 bg-white rounded-2xl shadow-lg space-y-6 border border-gray-200">
   <h2 className="text-xl font-semibold text-gray-700">🎯 Filter Startups</h2>
-  
+
   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
     {/* Industry Filter */}
-    <div>
-      <label className="block mb-2 text-sm font-medium text-gray-700">🏭 Industry</label>
-      <div className="flex flex-wrap gap-2">
-        {[
-          "Technology", "Healthcare", "Finance", "Education", "Retail and E-commerce", 
-          "Environment and Energy", "Real Estate and Construction", "Media and Entertainment", 
-          "Transportation and Logistics", "Aerospace and Defense", "Food and Agriculture", 
-          "Travel and Hospitality", "Legal and Compliance", "Consumer Services"
-        ].map((industry) => (
+    <div className="relative inline-block text-left">
+      <button
+        onClick={() => setIndustryDropdownOpen(!industryDropdownOpen)}
+        className="inline-flex justify-center items-center px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 border border-gray-300 rounded-full shadow-sm hover:bg-gray-200 min-w-[10rem]"
+      >
+        🏭 Industry
+        <svg className="ml-2 w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fillRule="evenodd"
+            d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.25 8.29a.75.75 0 01-.02-1.06z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </button>
+
+      {industryDropdownOpen && (
+        <div className="absolute z-10 mt-2 w-64 origin-top-right bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+          <h4 className="mb-2 text-sm font-semibold text-gray-800">Filter by Industry</h4>
+          <div className="max-h-60 overflow-y-auto space-y-1">
+            {industries.map((industry) => (
+              <label key={industry} className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={selectedIndustries.includes(industry)}
+                  onChange={() =>
+                    setSelectedIndustries((prev) =>
+                      prev.includes(industry)
+                        ? prev.filter((i) => i !== industry)
+                        : [...prev, industry]
+                    )
+                  }
+                  className="form-checkbox h-4 w-4 text-blue-600"
+                />
+                {industry}
+              </label>
+            ))}
+          </div>
           <button
-            key={industry}
-            onClick={() =>
-              setSelectedIndustries((prev) =>
-                prev.includes(industry)
-                  ? prev.filter((i) => i !== industry)
-                  : [...prev, industry]
-              )
-            }
-            className={`px-3 py-1 text-sm rounded-full border transition-all ${
-              selectedIndustries.includes(industry)
-                ? "bg-blue-600 text-white border-blue-600"
-                : "bg-gray-100 text-gray-600 hover:bg-blue-50"
-            }`}
+            onClick={() => setIndustryDropdownOpen(false)}
+            className="mt-4 min-w-full bg-blue-600 text-white py-1.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition"
           >
-            {industry}
+            Apply
           </button>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
 
     {/* Stage Filter */}
-    <div >
-      <label className="block mb-2 text-sm font-medium text-gray-700">📈 Startup Stage</label>
-      <div className="flex flex-wrap gap-2">
-        {["Early-Stage", "Growth-Stage", "Late Stage"].map((stage) => (
+    <div className="relative inline-block text-left">
+      <button
+        onClick={() => setStageDropdownOpen(!stageDropdownOpen)}
+        className="inline-flex justify-center items-center px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 border border-gray-300 rounded-full shadow-sm hover:bg-gray-200 min-w-[10rem] "
+      >
+        📈 Startup Stage
+        <svg className="ml-2 w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fillRule="evenodd"
+            d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.25 8.29a.75.75 0 01-.02-1.06z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </button>
+
+      {stageDropdownOpen && (
+        <div className="absolute z-10 mt-2 w-64 origin-top-right bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+          <h4 className="mb-2 text-sm font-semibold text-gray-800">Filter by Startup Stage</h4>
+          <div className="max-h-60 overflow-y-auto space-y-1">
+            {["Early-Stage", "Growth-Stage", "Late Stage"].map((stage) => (
+              <label key={stage} className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={selectedStages.includes(stage)}
+                  onChange={() =>
+                    setSelectedStages((prev) =>
+                      prev.includes(stage)
+                        ? prev.filter((s) => s !== stage)
+                        : [...prev, stage]
+                    )
+                  }
+                  className="form-checkbox h-4 w-4 text-green-600"
+                />
+                {stage}
+              </label>
+            ))}
+          </div>
           <button
-            key={stage}
-            onClick={() =>
-              setSelectedStages((prev) =>
-                prev.includes(stage)
-                  ? prev.filter((s) => s !== stage)
-                  : [...prev, stage]
-              )
-            }
-            className={`px-3 py-1 text-sm rounded-full border transition-all ${
-              selectedStages.includes(stage)
-                ? "bg-green-600 text-white border-green-600"
-                : "bg-gray-100 text-gray-600 hover:bg-green-50"
-            }`}
+            onClick={() => setStageDropdownOpen(false)}
+            className="mt-4 min-w-full  bg-green-600 text-white py-1.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition"
           >
-            {stage}
+            Apply
           </button>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
 
     {/* Funding Filter */}
-    <div>
-      <label className="block mb-2 text-sm font-medium text-gray-700">💸 Funding</label>
-      <div className="flex flex-wrap gap-2">
-        {["None (Self-funded)", "<$50k", "$50k-$500k", "$500k-$5M", "$5M+"].map((fund) => (
+    <div className="relative inline-block text-left">
+      <button
+        onClick={() => setFundingDropdownOpen(!fundingDropdownOpen)}
+        className="inline-flex justify-center items-center px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 border border-gray-300 rounded-full shadow-sm hover:bg-gray-200 min-w-[10rem] "
+      >
+        💸 Funding
+        <svg className="ml-2 w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fillRule="evenodd"
+            d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.25 8.29a.75.75 0 01-.02-1.06z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </button>
+
+      {fundingDropdownOpen && (
+        <div className="absolute z-10 mt-2 w-64 origin-top-right bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+          <h4 className="mb-2 text-sm font-semibold text-gray-800">Filter by Funding</h4>
+          <div className="max-h-60 overflow-y-auto space-y-1">
+            {["None (Self-funded)", "<$50k", "$50k-$500k", "$500k-$5M", "$5M+"].map((fund) => (
+              <label key={fund} className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={selectedFunding.includes(fund)}
+                  onChange={() =>
+                    setSelectedFunding((prev) =>
+                      prev.includes(fund)
+                        ? prev.filter((f) => f !== fund)
+                        : [...prev, fund]
+                    )
+                  }
+                  className="form-checkbox h-4 w-4 text-purple-600"
+                />
+                {fund}
+              </label>
+            ))}
+          </div>
           <button
-            key={fund}
-            onClick={() =>
-              setSelectedFunding((prev) =>
-                prev.includes(fund)
-                  ? prev.filter((f) => f !== fund)
-                  : [...prev, fund]
-              )
-            }
-            className={`px-3 py-1 text-sm rounded-full border transition-all ${
-              selectedFunding.includes(fund)
-                ? "bg-purple-600 text-white border-purple-600"
-                : "bg-gray-100 text-gray-600 hover:bg-purple-50"
-            }`}
+            onClick={() => setFundingDropdownOpen(false)}
+            className="mt-4 min-w-full  bg-purple-600 text-white py-1.5 rounded-lg text-sm font-semibold hover:bg-purple-700 transition"
           >
-            {fund}
+            Apply
           </button>
-        ))}
-      </div>
+        </div>
+      )}
+    </div>
+
+    {/* Toggle - Liked */}
+    <div>
+      <button
+        onClick={() => setShowLiked((prev) => !prev)}
+        className={`min-w-[10rem]  ml-auto flex items-center justify-center gap-10 px-4 py-2 rounded-full text-sm transition-all border ${
+          showLiked
+            ? "bg-pink-600 text-white border-pink-600"
+            : "bg-gray-100 text-gray-700 hover:bg-pink-50"
+        }`}
+      >
+        ❤️ {showLiked ? "Liked Only" : "Include Unliked"}
+      </button>
+    </div>
+
+    {/* Toggle - Invested */}
+    <div>
+      <button
+        onClick={() => setShowInvested((prev) => !prev)}
+        className={`min-w-[10rem]  ml-auto flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm transition-all border ${
+          showInvested
+            ? "bg-yellow-500 text-white border-yellow-500"
+            : "bg-gray-100 text-gray-700 hover:bg-yellow-50"
+        }`}
+      >
+        💼 {showInvested ? "Invested Only" : "Include Non-Invested"}
+      </button>
     </div>
   </div>
-
-  {/* Toggle Buttons */}
-  <div className="flex gap-4 mt-2">
-    <button
-      onClick={() => setShowLiked((prev) => !prev)}
-      className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-all border ${
-        showLiked
-          ? "bg-pink-600 text-white border-pink-600"
-          : "bg-gray-100 text-gray-700 hover:bg-pink-50"
-      }`}
-    >
-      ❤️ {showLiked ? "Liked Only" : "Include Unliked"}
-    </button>
-
-    <button
-      onClick={() => setShowInvested((prev) => !prev)}
-      className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-all border ${
-        showInvested
-          ? "bg-yellow-500 text-white border-yellow-500"
-          : "bg-gray-100 text-gray-700 hover:bg-yellow-50"
-      }`}
-    >
-      💼 {showInvested ? "Invested Only" : "Include Non-Invested"}
-    </button>
-  </div>
 </div>
-
 
     
    
@@ -485,35 +581,18 @@ console.log(scheduledStartups)
             </span>
           </div>
 
-          {/* View Button */}
-          {/* <button
-            onClick={() => handleView(startup._id)}
-            className="px-4 py-1 bg-blue-700 text-white text-sm rounded-full hover:bg-blue-800 transition"
-          >
-            View
-          </button> */}
+         
+          {startup.website && (
+              <a
+                href={startup.website.startsWith('http') ? startup.website : `https://${startup.website}`}
 
-          {/* Invest + Like */}
-          {/* <div className="flex items-center justify-between space-x-2">
-            <button
-              onClick={() => handleInvested(startup)}
-              className={`px-4 py-2 border rounded-lg text-sm font-semibold transition ${
-                investedStartups.has(startup._id)
-                  ? 'bg-green-600 text-white border-green-600'
-                  : 'text-green-600 border-green-600 hover:bg-green-50'
-              }`}
-            >
-              {investedStartups.has(startup._id) ? 'Invested' : 'Mark as Invested'}
-            </button>
-
-            <button onClick={() => handleLike(startup)}>
-              {likedStartups.has(startup._id) ? (
-                <HeartSolid className="w-5 h-5 text-red-500" />
-              ) : (
-                <HeartOutline className="w-5 h-5 text-gray-400" />
-              )}
-            </button>
-          </div> */}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center text-sm text-blue-600 hover:underline"
+              >
+                🌐 Visit Site
+              </a>
+            )}
 
             {/* View + Invest + Like */}
               <div className="flex items-center justify-between space-x-2">
@@ -551,12 +630,21 @@ console.log(scheduledStartups)
 
           {/* Schedule Meeting */}
           {scheduledStartups.has(startup._id) ? (
-            <button
-              className="w-full py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-              onClick={() => alert('Redirect to feedback form or handle feedback logic')}
-            >
-              Give Feedback
-            </button>
+              <button
+                  className="pop inline-flex items-center justify-center px-2.5 py-1 text-xs font-medium bg-purple-300 text-purple-900 rounded-full shadow-sm hover:bg-purple-400 transition duration-300"
+                  onClick={async () => {
+                    console.log("button clicked");
+                    const data = await fetchName(email);
+                    console.log("data came", data.photo);
+                    setFeedbackStartupName(startup.startupName);
+                    setfeedbackMail(startup.client_mail);
+                    setInvphoto(data.photo);
+                    setStartupId(startup._id);
+                    openFeedback();
+                  }}
+                >
+                  💬 Give Feedback
+                </button>
           ) : activeStartupId === startup._id ? (
             <>
               <input
@@ -667,8 +755,23 @@ console.log(scheduledStartups)
                             onClose={() => setIsPopupOpen(false)} 
                           />
                         )}
-         </main>
-                       </div>
+                        {isPopupOpen && (
+                          <PopupModal 
+                            fileUrl={fileUrl} 
+                            onClose={() => setIsPopupOpen(false)} 
+                          />
+                        )}
+                         {isFeedbackOpen && (
+                              <FeedbackPopup
+                                 startupId={startupId}
+                                startupName={feedbackStartupName}
+                                clientEmail={feedbackMail}
+                                Invphoto={Invphoto}
+                                onClose={closeFeedback}
+                              />
+                            )}
+                         </main>
+              </div>
   );
 };
 

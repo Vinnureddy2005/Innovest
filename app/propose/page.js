@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+
 export default function ProposeIdeaPage() {
   const [step, setStep] = useState(1);
   const email = sessionStorage.getItem('email'); 
@@ -159,7 +160,8 @@ export default function ProposeIdeaPage() {
          
         } else {
           //console.error("Validation failed:", validationResponse.missing_fields);
-          alert("Validation failed: Missing required fields:\n" + validationResponse.missing_fields.join(', '));
+          //alert("Validation failed: Missing required fields:\n" + validationResponse.missing_fields.join(', '));
+          alert(validationResponse.issues)
 
         }
         setLoading(false);  // Hide loading animation after validation process completes
@@ -309,7 +311,7 @@ export default function ProposeIdeaPage() {
         {step === 2 && (
           <>
             <div className="mb-6">
-               <Link href="/template"> <h3 className='ml-90 mt-[-20]'> Click here to download template</h3></Link>
+               <Link href="/template"> <h3 className='ml-90 mt-[-20] font-bold'> Click here to download template</h3></Link>
   <label className="block font-semibold mt-2 ">Upload Supporting Document</label>
   <label
     htmlFor="file"
@@ -372,7 +374,14 @@ export default function ProposeIdeaPage() {
             </div>
           </>
         )}
+        
       </div>
+ <button
+      onClick={() => router.push('/client_dashboard')}
+        className="fixed bottom-4 left-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-blue-600 z-50"
+    >
+      Back
+    </button>
     </div>
   );
 }
