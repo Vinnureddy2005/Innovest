@@ -54,7 +54,7 @@ const [selectedPlan, setSelectedPlan] = useState('');
       {/* Login Card */}
       <div className="relative z-10 flex items-center justify-center h-full">
         <div className="backdrop-blur-md bg-white/10 border border-white/30 rounded-2xl shadow-2xl p-10 w-[90%] max-w-xl transition-all duration-300">
-          <h2 className="text-3xl font-bold text-white text-center mb-4">Welcome Back!</h2>
+          <h2 className="text-3xl font-bold text-white text-center mb-4">Welcome Back Investor!</h2>
           <p className="text-white text-sm text-center mb-6">Please login to your account</p>
 
           {error && <p className="text-red-400 text-sm text-center">{error}</p>}
