@@ -2,13 +2,13 @@
 
 import { loadStripe } from "@stripe/stripe-js";
 import Image from "next/image";
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 export default function ClientRenewalPage() {
-  const searchParams = useSearchParams();
+ 
 
   // Get email and plan from URL query params
  

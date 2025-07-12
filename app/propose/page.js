@@ -2,11 +2,22 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
 
 export default function ProposeIdeaPage() {
+
+  const [email, setEmail] = useState(null);
+
+  useEffect(() => {
+    // ✅ This runs only on the client (browser)
+    const storedEmail = sessionStorage.getItem('email');
+    if (storedEmail) {
+      setEmail(storedEmail);
+    }
+  }, []);
   const [step, setStep] = useState(1);
-  const email = sessionStorage.getItem('email'); 
+ 
   const [formData, setFormData] = useState({
     startupName: '',
     website: '',

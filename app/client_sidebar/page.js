@@ -1,4 +1,5 @@
 
+
 // 'use client';
 
 // import {
@@ -13,7 +14,7 @@
 // import Link from 'next/link';
 // import { useEffect, useState } from 'react';
 
-// export default function Sidebar({ darkMode, handleLogout }) {
+// export default function Sidebar({  handleLogout }) {
 //   const [email, setEmail] = useState('');
 //   const [name, setName] = useState('');
 //   const [profilePic, setProfilePic] = useState('');
@@ -46,9 +47,8 @@
 //   }, []);
 
 //   return (
-//     <div className={`w-64 h-screen ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg flex flex-col justify-between p-6 overflow-y-hidden`}>
+//     <div className={`w-64 h-screen shadow-lg flex flex-col justify-between p-6 overflow-y-hidden`}>
       
-//       {/* Top Navigation */}
 //       <ul className="space-y-6 text-lg">
 //         <h2 className="text-2xl font-bold mb-10">Innovest🚀</h2>
 //         <li className="flex items-center gap-2 hover:text-blue-500">
@@ -102,7 +102,6 @@
 // }
 
 
-
 'use client';
 
 import {
@@ -117,7 +116,7 @@ import {
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-export default function Sidebar({  handleLogout }) {
+function Sidebar({ handleLogout }) {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [profilePic, setProfilePic] = useState('');
@@ -151,7 +150,6 @@ export default function Sidebar({  handleLogout }) {
 
   return (
     <div className={`w-64 h-screen shadow-lg flex flex-col justify-between p-6 overflow-y-hidden`}>
-      
       <ul className="space-y-6 text-lg">
         <h2 className="text-2xl font-bold mb-10">Innovest🚀</h2>
         <li className="flex items-center gap-2 hover:text-blue-500">
@@ -180,7 +178,6 @@ export default function Sidebar({  handleLogout }) {
         </li>
       </ul>
 
-      {/* Bottom Profile + Logout */}
       <div>
         <div className="flex items-center gap-4 mt-10 mb-4">
           <img
@@ -202,4 +199,14 @@ export default function Sidebar({  handleLogout }) {
       </div>
     </div>
   );
+}
+
+// ✅ This is the valid default export for the page
+export default function Page() {
+  const handleLogout = () => {
+    sessionStorage.clear();
+    window.location.href = '/';
+  };
+
+  return <Sidebar handleLogout={handleLogout} />;
 }

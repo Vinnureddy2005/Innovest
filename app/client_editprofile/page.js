@@ -4,7 +4,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Sidebar from '../client_sidebar/page';
+import Sidebar1 from '../components/Sidebar1';
 export default function ClientEditProfile() {
   const router = useRouter();
   
@@ -123,7 +123,7 @@ export default function ClientEditProfile() {
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <Sidebar handleLogout={handleLogout} />
+      <Sidebar1 handleLogout={handleLogout} />
 
       {/* Main Content */}
       <div className="flex flex-col flex-1 items-center p-8">

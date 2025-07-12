@@ -4,7 +4,7 @@ import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaHeart } from 'react-icons/fa';
-import Sidebar from '../client_sidebar/page';
+import Sidebar1 from '../components/Sidebar1';
 export default function ViewPreviousProposals() {
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -164,7 +164,7 @@ export default function ViewPreviousProposals() {
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-     <Sidebar handleLogout={handleLogout} />
+     <Sidebar1 handleLogout={handleLogout} />
 
       {/* Main Content */}
       <div className="flex-1 p-10">

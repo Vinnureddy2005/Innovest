@@ -3,7 +3,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Sidebar from '../investor_sidebar/page';
+import Sidebar2 from '../components/Sidebar2';
 export default function InvestorEditProfile() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -99,7 +99,7 @@ export default function InvestorEditProfile() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <Sidebar handleLogout={handleLogout} />
+      <Sidebar2 handleLogout={handleLogout} />
       <div className="flex flex-col flex-1 items-center p-8">
         <div className="w-full max-w-4xl bg-white shadow-lg rounded-2xl p-8">
           <div className="flex flex-col items-center mb-8">

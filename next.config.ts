@@ -1,20 +1,32 @@
-// import type { NextConfig } from "next";
+// // import type { NextConfig } from "next";
 
-// const nextConfig: NextConfig = {
-//   /* config options here */
+// // const nextConfig: NextConfig = {
+// //   /* config options here */
   
+// // };
+
+
+// // export default nextConfig;
+
+// /** @type {import('next').NextConfig} */
+// const nextConfig = {
+//   /* your config options here */
+
+//   eslint: {
+//     ignoreDuringBuilds: true,
+//   },
 // };
 
+// module.exports = nextConfig;
 
-// export default nextConfig;
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  /* your config options here */
+import type { NextConfig } from 'next';
 
+const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // ✅ DO NOT include output: 'export'
 };
 
-module.exports = nextConfig;
+export default nextConfig;

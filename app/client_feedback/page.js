@@ -6,7 +6,7 @@ import {
   FaLightbulb,
   FaStar,
 } from 'react-icons/fa';
-import Sidebar from '../client_sidebar/page';
+import Sidebar1 from '../components/Sidebar1';
 export default function ClientFeedbackPage() {
   const [email, setEmail] = useState(null);
   const [feedbacks, setFeedbacks] = useState([]);
@@ -73,7 +73,7 @@ export default function ClientFeedbackPage() {
   return (
   <div className="flex min-h-screen">
       {/* Sidebar on the left */}
-      <Sidebar />
+      <Sidebar1 />
 
       {/* Main content on the right */}
       <div className="flex-1 p-6">       <h2 className="text-3xl font-semibold mb-8 border-b pb-2 border-gray-300">
