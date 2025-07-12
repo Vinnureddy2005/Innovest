@@ -8,16 +8,22 @@ import { useEffect, useState } from 'react';
 export default function ProposeIdeaPage() {
 
   const [email, setEmail] = useState(null);
-      console.log("hi");
+     
 
   useEffect(() => {
     // ✅ This runs only on the client (browser)
 
     const storedEmail = sessionStorage.getItem('email');
-    if (storedEmail) {
-      setEmail(storedEmail);
-    }
+  
+      if (storedEmail) {
+    setEmail(storedEmail);
+    console.log("✅ Email found:", storedEmail);
+  }
+    
+    
   }, []);
+
+   console.log("hi",email);
   const [step, setStep] = useState(1);
  
   const [formData, setFormData] = useState({
@@ -81,7 +87,7 @@ export default function ProposeIdeaPage() {
   const handleBack = () => setStep(prev => prev - 1);
   const handleSubmit = async () => {
     console.log('Submitting:', formData);
-
+     console.log("form",email);
     
     
     const form = new FormData();
@@ -90,19 +96,19 @@ export default function ProposeIdeaPage() {
     form.append('industry', formData.industry);
     form.append('stage', formData.stage);
     form.append('funding', formData.funding);
-    form.append('client_mail', formData.client_mail);
+    form.append('client_mail', email);
     form.append('file', uploadedFile); 
 
 
   
     try {
-       const storedEmail = sessionStorage.getItem('email'); 
-          if (!storedEmail) {
+      
+          if (!email) {
             console.error('No user email found.');
             return;
           }
   
-        const client_res = await fetch(`/api/client_profile?email=${storedEmail}`);
+        const client_res = await fetch(`/api/client_profile?email=${email}`);
         if (!client_res.ok) {
             console.error('Failed to fetch client data');
             return;

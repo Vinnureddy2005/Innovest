@@ -28,42 +28,53 @@ const [feedbackStartupName, setFeedbackStartupName] = useState(null);
 
   const [email, setEmail] = useState(null);
   useEffect(() => {
-     const emailParam = searchParams.get('email');
-    if (!emailParam) return;
+  const emailParam = searchParams.get('email');
+  if (!emailParam) return;
 
-    // Store and set email
-    sessionStorage.setItem('email', emailParam);
-    setEmail(emailParam);
-    const fetchRecommendedStartups = async () => {
-      try {
-        const response = await fetch(`/api/recommendations?email=${email}`);
-        const data = await response.json();
+  sessionStorage.setItem('email', emailParam);
+  setEmail(emailParam);
+
+  const fetchRecommendedStartups = async (emailToUse) => {
+    try {
+      const response = await fetch(`/api/recommendations?email=${emailToUse}`);
+      const data = await response.json();
+     
+      if (Array.isArray(data)) {
         setRecommendedStartups(data);
-      } catch (error) {
-        console.error("Error fetching recommendations:", error);
+      } else {
+        console.warn("Unexpected recommendations format:", data);
+        setRecommendedStartups([]);
       }
-    };
 
-    fetchRecommendedStartups();
-  }, [searchParams]);
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+    }
+  };
+
+  fetchRecommendedStartups(emailParam); // use param directly
+}, [searchParams]);
 
   useEffect(() => {
-    if (!email) return;
-    sessionStorage.setItem('email', email);
+  if (!email) return;
 
-    const fetchCFRecommendedStartups = async () => {
-      try {
-        const response = await fetch(`/api/cf/?email=${email}`);
-        const data = await response.json();
-        console.log('Collaborative Filtering Startups:', data);
-        setCFRecommendedStartups(data.recommendations || []);
-      } catch (error) {
-        console.error("Error fetching collaborative filtering recommendations:", error);
+  const fetchCFRecommendedStartups = async () => {
+    try {
+      const response = await fetch(`/api/cf/?email=${email}`);
+      const data = await response.json();
+      if (data && Array.isArray(data.recommendations)) {
+        setCFRecommendedStartups(data.recommendations);
+      } else {
+        console.warn("Unexpected CF format:", data);
+        setCFRecommendedStartups([]);
       }
-    };
 
-    fetchCFRecommendedStartups();
-  }, [email]);
+    } catch (error) {
+      console.error("Error fetching collaborative filtering recommendations:", error);
+    }
+  };
+
+  fetchCFRecommendedStartups();
+}, [email]);
 
   useEffect(() => {
     console.log("Updated cfRecommendedStartups:", cfRecommendedStartups);
