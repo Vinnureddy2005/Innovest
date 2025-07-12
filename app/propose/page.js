@@ -8,9 +8,11 @@ import { useEffect, useState } from 'react';
 export default function ProposeIdeaPage() {
 
   const [email, setEmail] = useState(null);
+      console.log("hi");
 
   useEffect(() => {
     // ✅ This runs only on the client (browser)
+
     const storedEmail = sessionStorage.getItem('email');
     if (storedEmail) {
       setEmail(storedEmail);
