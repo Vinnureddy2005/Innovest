@@ -21,11 +21,12 @@ const DashboardContent = () => {
   const [recommendedStartups, setRecommendedStartups] = useState([]);
   const [cfRecommendedStartups, setCFRecommendedStartups] = useState([]);
   const searchParams = useSearchParams();
-  const email = searchParams.get('email');
+
   const [likedStartups, setLikedStartups] = useState(new Set());
   const [investedStartups, setInvestedStartups] = useState(new Set());
 const [feedbackStartupName, setFeedbackStartupName] = useState(null);
 
+  const [email, setEmail] = useState(null);
   useEffect(() => {
      const emailParam = searchParams.get('email');
     if (!emailParam) return;

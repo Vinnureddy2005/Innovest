@@ -10,7 +10,7 @@ import Sidebar1 from '../components/Sidebar1';
 export default function DashboardContent() {
   const router = useRouter(); 
   const searchParams = useSearchParams();
-  const emailFromQuery = searchParams.get('email');
+ 
 
   const [clientMail, setClientMail] = useState('');
   
@@ -29,7 +29,7 @@ export default function DashboardContent() {
       if (stored) setClientMail(stored);
     }
   }, [searchParams]);
-  
+
   useEffect(() => {
     if (!clientMail) return;
 
