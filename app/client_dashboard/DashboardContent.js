@@ -13,11 +13,14 @@ export default function DashboardContent() {
   const emailFromQuery = searchParams.get('email');
 
   const [clientMail, setClientMail] = useState('');
+  
   const [meetings, setMeetings] = useState([]);
   const [proposalsCount, setProposalCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+   useEffect(() => {
+    const emailFromQuery = searchParams.get('email');
+
     if (emailFromQuery) {
       sessionStorage.setItem('email', emailFromQuery);
       setClientMail(emailFromQuery);
@@ -25,8 +28,8 @@ export default function DashboardContent() {
       const stored = sessionStorage.getItem('email');
       if (stored) setClientMail(stored);
     }
-  }, [emailFromQuery]);
-
+  }, [searchParams]);
+  
   useEffect(() => {
     if (!clientMail) return;
 

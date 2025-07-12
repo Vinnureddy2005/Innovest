@@ -27,9 +27,12 @@ const DashboardContent = () => {
 const [feedbackStartupName, setFeedbackStartupName] = useState(null);
 
   useEffect(() => {
-    if (!email) return;
-    sessionStorage.setItem('email', email);
+     const emailParam = searchParams.get('email');
+    if (!emailParam) return;
 
+    // Store and set email
+    sessionStorage.setItem('email', emailParam);
+    setEmail(emailParam);
     const fetchRecommendedStartups = async () => {
       try {
         const response = await fetch(`/api/recommendations?email=${email}`);
@@ -41,7 +44,7 @@ const [feedbackStartupName, setFeedbackStartupName] = useState(null);
     };
 
     fetchRecommendedStartups();
-  }, [email]);
+  }, [searchParams]);
 
   useEffect(() => {
     if (!email) return;
