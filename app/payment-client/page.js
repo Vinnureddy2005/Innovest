@@ -21,7 +21,7 @@ export default function Payment() {
     const userDetails = JSON.parse(localStorage.getItem("signupData"));
     if (!userDetails?.email) {
       alert("No user data found!");
-      router.push("/");
+      router.push("https://innovest-j69q.vercel.app/");
       return;
     }
     setUserData(userDetails);
@@ -72,7 +72,7 @@ export default function Payment() {
       }
     } else {
       alert("Signup successful!");
-      router.push("/");
+      router.push("https://innovest-j69q.vercel.app/");
     }
     } catch (err) {
       alert("Error: " + err.message);

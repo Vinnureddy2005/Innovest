@@ -21,8 +21,8 @@ export async function POST(req) {
   // success_url: `${domain}/success`,
   // cancel_url: `${domain}/cancel`,
 
-   success_url: `http://localhost:3000/payment_investor?success=true&session_id={CHECKOUT_SESSION_ID}`,
-  cancel_url: `http://localhost:3000/payment_investor?cancelled=true`,
+   success_url: `https://innovest-j69q.vercel.app/payment_investor?success=true&session_id={CHECKOUT_SESSION_ID}`,
+  cancel_url: `https://innovest-j69q.vercel.app/payment_investor?cancelled=true`,
 });
 
 

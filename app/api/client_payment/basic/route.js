@@ -17,8 +17,8 @@ export async function POST(req) {
     },
   ],
  
-   success_url: `http://localhost:3000/payment-client?success=true&session_id={CHECKOUT_SESSION_ID}`,
-  cancel_url: `http://localhost:3000/payment-client?cancelled=true`,
+   success_url: `https://innovest-j69q.vercel.app/payment-client?success=true&session_id={CHECKOUT_SESSION_ID}`,
+  cancel_url: `https://innovest-j69q.vercel.app/payment-client?cancelled=true`,
 });
 
 
